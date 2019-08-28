@@ -14,7 +14,7 @@ If you want to pull the data in a live fashion (i.e., use `gaspy.gasdb`), you sh
     export PYTHONPATH="/global/project/projectdirs/m2755/GASpy_workspaces/GASpy/GASpy_feedback/:${PYTHONPATH}"
     export PYTHONPATH="/global/project/projectdirs/m2755/GASpy_workspaces/GASpy/GASpy_regressions/:${PYTHONPATH}"
 
-If you have access to the Cori GPUs, then you should create this file in `~/.local/share/jupyter/kernel/gaspy_ktran/kernel.json`:
+If you have access to the Cori GPUs, then you should create this file in `~/.local/share/jupyter/kernels/gaspy_ktran/kernel.json`:
 
     {
         "argv": [
@@ -37,7 +37,7 @@ Now you're ready to roll.
 
 I'm actually not sure what dependencies are all needed to run all the notebooks here.
 I know you need PyTorch, GPyTorch, SKLearn, Jupyter, etc., but I'm not positive if that's all-encompassing.
-What I do remember is that you need to hack your instalation of `skorch`. In `skorch/skorch/dataset.py`, delete these lines:
+What I do remember is that you need to hack your installation of `skorch`. In `skorch/skorch/dataset.py`, delete these lines:
 
     if len(len_set) != 1:
         raise ValueError("Dataset does not have consistent lengths.")
