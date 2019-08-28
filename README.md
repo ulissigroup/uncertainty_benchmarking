@@ -9,11 +9,13 @@ First, you'll need to clone `https://github.com/ulissigroup/cgcnn` and add it to
 Note that on Cori, you should edit your `~/.bashrc.ext`, not `~/.bashrc`.
 
 If you want to pull the data in a live fashion (i.e., use `gaspy.gasdb`), you should add this to your `~/.bashrc.ext` as well.
+
     export PYTHONPATH="/global/project/projectdirs/m2755/GASpy_workspaces/GASpy/:${PYTHONPATH}"
     export PYTHONPATH="/global/project/projectdirs/m2755/GASpy_workspaces/GASpy/GASpy_feedback/:${PYTHONPATH}"
     export PYTHONPATH="/global/project/projectdirs/m2755/GASpy_workspaces/GASpy/GASpy_regressions/:${PYTHONPATH}"
 
 If you have access to the Cori GPUs, then you should create this file in `~/.local/share/jupyter/kernel/gaspy_ktran/kernel.json`:
+
     {
         "argv": [
             "/global/homes/k/ktran/miniconda3/envs/gaspy/bin/python",
