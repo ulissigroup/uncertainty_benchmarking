@@ -37,7 +37,12 @@ Now you're ready to roll.
 
 I'm actually not sure what dependencies are all needed to run all the notebooks here.
 I know you need PyTorch, GPyTorch, SKLearn, Jupyter, etc., but I'm not positive if that's all-encompassing.
-Here is what `conda list --revisions` gives me (if that helps):
+What I do remember is that you need to hack your instalation of `skorch`. In `skorch/skorch/dataset.py`, delete these lines:
+
+    if len(len_set) != 1:
+        raise ValueError("Dataset does not have consistent lengths.")
+
+Otherwise, here is what `conda list --revisions` gives me (if that helps):
 
     2019-08-06 16:08:58  (rev 0)
 
