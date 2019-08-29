@@ -1,12 +1,13 @@
 This reposity should be used as a sandbox for performing various ML regressions with uncertainties.
 To start, we are modeling CO adsorption energy data we get from GASpy.
 
-# Environment
+# Dependencies
+
+Regardless of where you try to run these notebooks, you'll probably need to clone `https://github.com/ulissigroup/cgcnn` and add it to your `$PYTHONPATH`.
 
 ## Cori
 
-First, you'll need to clone `https://github.com/ulissigroup/cgcnn` and add it to your `$PYTHONPATH`.
-Note that on Cori, you should edit your `~/.bashrc.ext`, not `~/.bashrc`.
+Note that on Cori, you should update your `$PYTHONPATH` in `~/.bashrc.ext`, not `~/.bashrc`.
 
 If you want to pull the data in a live fashion (i.e., use `gaspy.gasdb`), you should add this to your `~/.bashrc.ext` as well.
 
