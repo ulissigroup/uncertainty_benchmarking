@@ -5,24 +5,15 @@ the SDT work out into this script so that I could perform and save it during an
 interactive SLURM job.
 '''
 
-import random
 import multiprocess as mp
 import pickle
 from tqdm import tqdm
-from gaspy.gasdb import get_adsorption_docs
 from cgcnn.data import StructureDataTransformer
 
 
-# Load a selection of documents
-docs = get_adsorption_docs('CO', extra_projections={'atoms': '$atoms',
-                                                    'results': '$results',
-                                                    'calc': '$calc',
-                                                    'initial_configuration': '$initial_configuration'})
-random.shuffle(docs)
-
-# Save the documents
-with open('docs.pkl', 'wb') as file_handle:
-    pickle.dump(docs, file_handle)
+# Load the documents
+with open('../pull_data/gaspy/docs.pkl', 'rb') as file_handle:
+    docs = pickle.load(file_handle)
 
 
 # Initialize CGCNN transformer
