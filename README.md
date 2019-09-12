@@ -3,7 +3,7 @@ To start, we are modeling CO adsorption energy data we get from GASpy.
 
 # Dependencies
 
-Regardless of where you try to run these notebooks, you'll probably need to clone `https://github.com/ulissigroup/cgcnn` and add it to your `$PYTHONPATH`.
+Regardless of where you try to run these notebooks, you'll probably need to clone the `sklearn-refactor` branch of `https://github.com/ulissigroup/cgcnn` and add it to your `$PYTHONPATH`.
 
 ## Cori
 
