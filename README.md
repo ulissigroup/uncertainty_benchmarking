@@ -3,7 +3,7 @@ To start, we are modeling CO adsorption energy data we get from GASpy.
 
 # Dependencies
 
-Regardless of where you try to run these notebooks, you'll probably need to clone `https://github.com/ulissigroup/cgcnn` and add it to your `$PYTHONPATH`.
+Regardless of where you try to run these notebooks, you'll probably need to clone the `sklearn-refactor` branch of `https://github.com/ulissigroup/cgcnn` and add it to your `$PYTHONPATH`.
 
 ## Cori
 
@@ -37,7 +37,7 @@ Now you're ready to roll.
 ## Make-your-own
 
 I'm actually not sure what dependencies are all needed to run all the notebooks here.
-I know you need PyTorch, GPyTorch, SKLearn, Jupyter, etc., but I'm not positive if that's all-encompassing.
+I know you need [ASE](https://anaconda.org/conda-forge/ase), [pymatgen](https://anaconda.org/matsci/pymatgen), PyTorch, GPyTorch, SKLearn, Jupyter, etc., but I'm not positive if that's all-encompassing.
 What I do remember is that you need to hack your installation of `skorch`. In `skorch/skorch/dataset.py`, delete these lines:
 
     if len(len_set) != 1:
