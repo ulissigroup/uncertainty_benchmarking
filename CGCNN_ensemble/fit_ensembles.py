@@ -21,12 +21,12 @@ else:
 
 
 # Load the data split from our Jupyter notebook cache
-with open('../preprocessing/feature_dimensions.pkl', 'rb') as file_handle:
+with open('../preprocessing/sdt/gasdb/feature_dimensions.pkl', 'rb') as file_handle:
     orig_atom_fea_len, nbr_fea_len = pickle.load(file_handle)
-with open('../preprocessing/splits.pkl', 'rb') as file_handle:
+with open('../preprocessing/splits_gasdb.pkl', 'rb') as file_handle:
     splits = pickle.load(file_handle)
-sdts_train = splits['sdts_train']
-targets_train = splits['targets_train']
+sdts_train, sdts_val = splits['sdts_train'], splits['sdts_val']
+targets_train, targets_val = splits['targets_train'], splits['targets_val']
 
 
 class train_end_load_best_valid_loss(skorch.callbacks.base.Callback):
