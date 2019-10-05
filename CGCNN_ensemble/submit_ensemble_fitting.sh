@@ -9,7 +9,7 @@
 #SBATCH --error=ensembling.error
 #SBATCH --mail-user=ktran@andrew.cmu.edu
 #SBATCH --mail-type=ALL
-#SBATCH --time=04:00:00
+#SBATCH --time=08:00:00
 
 
 source ~/miniconda3/bin/activate
