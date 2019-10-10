@@ -6,6 +6,7 @@ Our goal is to down-select the ML methods that give us the best prediction accur
 Each folder in this repository contains Jupyter notebooks that document how we used various ML methods to perform regressions on our data, and the results thereof.
 Each of these notebooks use the same set of features and data splits that we created from a couple of databases.
 
+
 # Data wrangling
 
 The `preprocessing` folder shows how we used various APIs to gather and preprocess our data into features.
@@ -23,8 +24,12 @@ Thus `fingerprint`s in this repository reference this type of feature.
 Another way to featurize atomic structures is to use a [`StructureDataTransformer`](https://github.com/ulissigroup/cgcnn/blob/sklearn_refactor/cgcnn/data.py#L378) for a [Crystal Graph Convolutional Neural Network](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.120.145301).
 Thus `sdt`s in this repository reference this type of feature.
 
+# Written report
+
+The [written report](./paper/uncertainty_benchmarking.pdf) of our findings can be found in the paper folder, along with all of the files needed to compile the report.
+
 
 # Dependencies
 
-Refer to our [list of dependencies](./notes/dependencies.md).
+Refer to our [list of dependencies](./notes/dependencies.md) for the dependencies required to run the Jupyter notebooks in this repository.
 
