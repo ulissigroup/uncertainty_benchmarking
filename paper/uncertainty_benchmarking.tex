@@ -18,8 +18,10 @@
 \title{Uncertainty Benchmark (placeholder)}
 \author{Kevin Tran}
 \affiliation{Department of Chemical Engineering, Carnegie Mellon University, Pittsburgh, PA 15217}
+\altaffiliation{These authors contributed equally to this work}
 \author{Willie Neiswanger}
 \affiliation{Department of Machine Learning, Carnegie Mellon University, Pittsburgh, PA 15217}
+\altaffiliation{These authors contributed equally to this work}
 \author{Junwoong Yoon}
 \affiliation{Department of Chemical Engineering, Carnegie Mellon University, Pittsburgh, PA 15217}
 \author{Eric Xing}
@@ -51,27 +53,82 @@
 
 \section{Introduction}
 
-Intro here. Proxy citation here.\cite{Tran2018}
+\begin{enumerate}
+    \item{ML/DS + catalysis\cite{Tran2018}}
+
+    \item{Why uncertainty?}
+        \begin{enumerate}
+            \item{want confidence on DFT predictions themselves}
+            \item{active routines}
+        \end{enumerate}
+
+    \item{Very quick overview of the paper (Figure~\ref{fig:overview})}
+\end{enumerate}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{placeholder.png}
+    \caption{Placeholder for overview of the paper}\label{fig:overview}
+\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%% Methods %%%%%%%%%%%%%%%%%%%%
 
 \section{Methods}
 
-Methods here.
+\begin{enumerate}
+    \item{Data}
+        \begin{enumerate}
+            \item{GASdb}
+            \item{Splits}
+            \item{VASP(?)}
+            \item{Blocking (on best)}
+        \end{enumerate}
+    \item{Modeling}
+        \begin{enumerate}
+            \item{CGCNN}
+            \item{CGCNN Ensemble}
+            \item{GP}
+            \item{GP with CGCNN}
+            \item{With other kernels too}
+            \item{Penultimate-Fed GP}
+            \item{Bayesian CGCNN with prior on weights at some layer}
+            \item{Supervised error prediction (delta CGCNN)}
+            \item{Dropout CGCNN}
+        \end{enumerate}
+    \item{Assessment}
+        \begin{enumerate}
+            \item{accuracy}
+            \item{calibration}
+            \item{sharpness}
+        \end{enumerate}
+\end{enumerate}
+
+%\subsection{Assesment methods}
+
 
 %%%%%%%%%%%%%%%%%%%% Results %%%%%%%%%%%%%%%%%%%%
 
 \section{Results}
 
-%\subsection{Foo}
+\begin{enumerate}
+    \item{Table/figure of accuracies: MSE, MAE, R2, [willie get list]}
+    \item{Plots:}
+        \begin{enumerate}
+            \item{Parity plots}
+            \item{Calibration/sharpness plots}
+            \item{Sharpness values per method}
+        \end{enumerate}
+    \item{Cost of computing each method (if it’s there)}
+    \item{Human overhead and difficulty}
+\end{enumerate}
 
 
 %%%%%%%%%%%%%%%%%%%% Conclusions %%%%%%%%%%%%%%%%%%%%
 
 \section{Conclusions}
 
-Conclusions here
+Observations about relative accuracies, calibrations, sharpnesses, overhead
 
 
 %%%%%%%%%%%%%%%%%%%% Misc %%%%%%%%%%%%%%%%%%%%
