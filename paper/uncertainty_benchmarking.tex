@@ -7,12 +7,14 @@
 \apptocmd{\thebibliography}{\raggedright}{}{}
 \usepackage{glossaries}     % Enable the \newacronym and \gls commands to reference terms
 
-\newacronym{DFT}{DFT}{density functional theory}
-\newacronym{FCC}{FCC}{face-centered cubic}
+\newacronym{DFT}{DFT}{Density Functional Theory}
 \newacronym{VASP}{VASP}{the Vienna Ab-initio Simulation Package}
 \newacronym{GASpy}{GASpy}{the Generalized Adsorption Simulator for Python}
 \newacronym{rPBE}{rPBE}{revised Perdew-Burke-Ernzerhof}
 \newacronym{ASE}{ASE}{the Atomic Simulation Environment}
+\newacronym{NEB}{NEB}{nudged elastic band}
+\newacronym{GP}{GP}{Gaussian Process}
+\newacronym{UQ}{UQ}{uncertainty quantification}
 
 
 %\usepackage{booktabs}       % Use table things like \toprule or \bottomrule
@@ -20,23 +22,21 @@
 %\usepackage{makecell}       % Allow the use of the \makecell command that lets linebreaks in table cells
 %\usepackage{pdflscape}      % Enable the \begin{landscape} command
 
-% chktex-file 36
-
 
 %%%%%%%%%%%%%%%%%%%% Title/Abstract %%%%%%%%%%%%%%%%%%%%
 \title{Uncertainty Benchmark (placeholder)}
 \author{Kevin Tran}
-\affiliation{Department of Chemical Engineering, Carnegie Mellon University, Pittsburgh, PA 15217}
+\affiliation{Chemical Engineering Department, Carnegie Mellon University, Pittsburgh, PA 15217}
 \altaffiliation{These authors contributed equally to this work}
 \author{Willie Neiswanger}
 \affiliation{Machine Learning Department, Carnegie Mellon University, Pittsburgh, PA 15217}
 \altaffiliation{These authors contributed equally to this work}
 \author{Junwoong Yoon}
-\affiliation{Department of Chemical Engineering, Carnegie Mellon University, Pittsburgh, PA 15217}
+\affiliation{Chemical Engineering Department, Carnegie Mellon University, Pittsburgh, PA 15217}
 \author{Eric Xing}
 \affiliation{Machine Learning Department, Carnegie Mellon University, Pittsburgh, PA 15217}
 \author{Zachary W. Ulissi}
-\affiliation{Department of Chemical Engineering, Carnegie Mellon University, Pittsburgh, PA 15217}
+\affiliation{Chemical Engineering Department, Carnegie Mellon University, Pittsburgh, PA 15217}
 \email{zulissi@andrew.cmu.edu}
 
 \begin{document}
@@ -62,17 +62,23 @@
 
 \section{Introduction}
 
-\begin{enumerate}
-    \item{ML/DS + catalysis}
+The fields of catalysis and materials science are burgeoning with research articles that use machine learning and data science to screen, design, and understand materials.\cite{Medford2018, Gu2019, Schleder2019, Alberi2019}
+This research has spurned the creation of machine learning models to predict various material properties.
+Unfortunately, the design spaces for these models are sometimes too large and intractable to sample completely.
+These undersampling issues can limit the training data and therefore the predictive power of the models.
+It would be helpful to have an \gls{UQ} for a model so that we know when to trust the predictions and when not to.
+More specifically:  \gls{UQ} would enable various online, active frameworks for materials discovery and design (e.g., active learning,\cite{Settles2012} online active learning,\cite{Chu2011} Bayesian optimization,\cite{Frazier2018} active search,\cite{Garnett2012} or goal oriented design of experiments\cite{Kandasamy}).
 
-    \item{Why uncertainty?}
-        \begin{enumerate}
-            \item{want confidence on DFT predictions themselves}
-            \item{active routines}
-        \end{enumerate}
+Such active frameworks have already been used successfully in the field of catalysis and materials informatics.
+For example:  \citet{Peterson2016} has used a neural network to perform online active learning of \gls{NEB} calculations, reducing the number of force calls by an order of magnitude.
+\citet{Torres2018} have used also used online active learning to accelerate \gls{NEB} calculations, but they used a \gls{GP} model instead of a neural network.
+\citet{Jinnouchi2019} have used online active learning to accelerate molecular dynamics simulations.
+Each of these active methods are underpinned by models with \gls{UQ}, which has garnered increasing attention itself.\cite{Peterson2017, Musil2019}
 
-    \item{Very quick overview of the paper (Figure~\ref{fig:overview})}
-\end{enumerate}
+To our knowledge though, we have not seen many comparisons of different methods for \gls{UQ} within the field of catalysis and materials informatics.
+Here we attempt to resolve this issue by benchmarking six different methods for \gls{UQ} (Figure~\ref{fig:overview}).
+We acknowledge that there will not be one optimal method across all use cases, but we still find value in sharing these results so that others can build intuition from our results.
+Perhaps more importantly, we have also established a protocol for comparing the performance of different modeling and \gls{UQ} methods.
 
 \begin{figure}
     \centering
@@ -100,28 +106,29 @@ The bottom layers of each slab were fixed and defined as those atoms more than 3
 To split the data into train/validate/test sets, we first enumerated all adsorption energies on monometallic slabs and added them to the training set manually. 
 We did this because some of the regression methods in this paper use a featurization that contains our monometallic adsorption energy data\cite{Tran2018}, and so having the monometallic adsorption energies pre-allocated in the training set prevented any information leakage between the training set and validation/test sets.
 After this allocation, we performed a 64/14/20 train/validate/test split that was stratified\cite{Thompson2012} by adsorbate.
-We used the train/validate partitions to tune various hyperparameters manually.
-To create the results shown in this paper, we combined the training and validation partitions into a single training set and reported models' performances on the held-out training set.
+We then used the validation set's results to tune various hyperparameters manually.
+After tuning, we calculated the training set results and present them in this paper exclusively.
+
+\subsection{Regression methods}
 
 \begin{enumerate}
-    \item{Modeling}
-        \begin{enumerate}
-            \item{CGCNN}
-            \item{CGCNN Ensemble}
-            \item{GP}
-            \item{GP with CGCNN}
-            \item{With other kernels too}
-            \item{Penultimate-Fed GP}
-            \item{Bayesian CGCNN with prior on weights at some layer}
-            \item{Supervised error prediction (delta CGCNN)}
-            \item{Dropout CGCNN}
-        \end{enumerate}
-    \item{Assessment}
-        \begin{enumerate}
-            \item{accuracy}
-            \item{calibration}
-            \item{sharpness}
-        \end{enumerate}
+    \item{CGCNN}
+    \item{CGCNN Ensemble}
+    \item{GP}
+    \item{GP with CGCNN}
+    \item{With other kernels too}
+    \item{Penultimate-Fed GP}
+    \item{Bayesian CGCNN with prior on weights at some layer}
+    \item{Supervised error prediction (delta CGCNN)}
+    \item{Dropout CGCNN}
+\end{enumerate}
+
+\subsection{Performance metrics}
+
+\begin{enumerate}
+    \item{accuracy}
+    \item{calibration}
+    \item{sharpness}
 \end{enumerate}
 
 
