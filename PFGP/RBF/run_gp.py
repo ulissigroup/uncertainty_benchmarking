@@ -18,9 +18,9 @@ print('Planning to run on {} GPUs.'.format(n_devices))
 output_device = torch.device('cuda:0')
 
 # Pull training data
-with open('../preprocessing/sdt/gasdb/feature_dimensions.pkl', 'rb') as file_handle:
+with open('../../preprocessing/sdt/gasdb/feature_dimensions.pkl', 'rb') as file_handle:
     orig_atom_fea_len, nbr_fea_len = pickle.load(file_handle)
-with open('../preprocessing/splits_gasdb.pkl', 'rb') as file_handle:
+with open('../../preprocessing/splits_gasdb.pkl', 'rb') as file_handle:
     splits = pickle.load(file_handle)
 docs_train, docs_val = splits['docs_train'], splits['docs_val']
 sdts_train, sdts_val = splits['sdts_train'], splits['sdts_val']
