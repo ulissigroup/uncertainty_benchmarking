@@ -1,7 +1,7 @@
 '''
-When we use Jupyter, it's shared with others. It turns out that when we share,
-we don't get enough memory. So we get an interactive GPU all to ourselves and
-run it in python here.
+It turns out that we need multiple GPUs to do GP fitting (because of the cubic
+memory requirements). And our current setup has multiple GPUs, but not inside
+Jupyter. So we turn the things into a Python script and run it here.
 '''
 
 import gc
