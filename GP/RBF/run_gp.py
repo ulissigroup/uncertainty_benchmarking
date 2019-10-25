@@ -19,7 +19,7 @@ print('Planning to run on {} GPUs.'.format(n_devices))
 output_device = torch.device('cuda:0')
 
 # Pull training data
-with open('../preprocessing/splits_gasdb.pkl', 'rb') as file_handle:
+with open('../../preprocessing/splits_gasdb.pkl', 'rb') as file_handle:
     splits = pickle.load(file_handle)
 
 docs_train = splits['docs_train']
