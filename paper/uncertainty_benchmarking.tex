@@ -1,6 +1,7 @@
 \documentclass[]{achemso}
 
 \usepackage{amsmath}        % Equation editing using flags of \begin{align} and \end{align}
+\usepackage{commath}        % We have this here to use the \abs{} equation function
 \usepackage{graphicx}       % Display figures using \includegraphics
 \graphicspath{{figures/}}   % Location for figures relative to .tex file path
 \usepackage{etoolbox}       % Make the bibliograph unjustified (to work around hbox errors)
@@ -15,7 +16,12 @@
 \newacronym{NEB}{NEB}{nudged elastic band}
 \newacronym{GP}{GP}{Gaussian Process}
 \newacronym{UQ}{UQ}{uncertainty quantification}
-
+\newacronym{MAE}{MAE}{Mean Absolute Error}
+\newacronym{RMSE}{RMSE}{Root Mean Squared Error}
+\newacronym{MDAE}{MDAE}{Median Absolute Deviation}
+\newacronym{MARPD}{MARPD}{Mean Absolute Relative Percent Difference}
+\newacronym{R2}{R\textsuperscript{2}}{R\textsuperscript{2} correlation coefficient}
+\newacronym{Pearson}{Pearson's}{Pearson product-moment correlation coefficent}
 
 %\usepackage{booktabs}       % Use table things like \toprule or \bottomrule
 %\usepackage[table]{xcolor}  % Lets us use \rowcolors to make alternate table shading
@@ -24,7 +30,7 @@
 
 
 %%%%%%%%%%%%%%%%%%%% Title/Abstract %%%%%%%%%%%%%%%%%%%%
-\title{Uncertainty Benchmark (placeholder)}
+\title{Uncertainty quantification in deep networks for material property predictions}
 \author{Kevin Tran}
 \affiliation{Chemical Engineering Department, Carnegie Mellon University, Pittsburgh, PA 15217}
 \altaffiliation{These authors contributed equally to this work}
@@ -125,11 +131,44 @@ After tuning, we calculated the training set results and present them in this pa
 
 \subsection{Performance metrics}
 
-\begin{enumerate}
-    \item{accuracy}
-    \item{calibration}
-    \item{sharpness}
-\end{enumerate}
+We used six different metrics to quantify the accuracy of the various models:  \gls{MAE}, \gls{RMSE}, \gls{MDAE}, \gls{MARPD}, \gls{R2}, and \gls{Pearson}.
+\gls{MARPD} values were calculated with Equation~\ref{eq:marpd}
+
+\begin{equation}\label{eq:marpd}
+    MARPD = \frac{1}{N} \sum_{i=1}^{N} \abs{100 \cdot \frac{\hat{x}_n - x_n}{\abs{\hat{x}_n} + \abs{x_n}}}
+\end{equation}
+
+\noindent where $n$ is the index of a data point, $N$ is the total number of data points, $x_n$ is the true value of the data point, and $\hat{x}_n$ is the model's estimate of $x_n$.
+In this case, $x_n$ is a DFT-calculated adsorption energy and $\hat{x}_n$ is the surrogate-model-calculated adsorption energy.
+We used \gls{MDAE} because is insensitive to outliers and is therefore a good measure of accuracy for the majority of the data.
+We used \gls{RMSE} because it is sensitive to outliers and is therefore a good measure of worst-case accuracy.
+We used \gls{MAE} because it lies between \gls{MDAE} and \gls{RMSE} in terms of sensitivity to outliers.
+We used \gls{MARPD}, \gls{R2}, and \gls{Pearson} because they provide normalized measures of accuracy that may be more interpretable for those unfamiliar with adsorption energy measurements in eV.
+The ensemble of these metrics provide a more robust view of accuracy than any one metric can provide alone.
+
+To assess the calibration (or ``honesty'') of these models' UQs, we created calibration curves. A calibration curve ``displays the true frequency of points in each [prediction] interval relative to the predicted fraction of points in that interval'', as outlined by \citet{Kuleshov2018}.
+In other words:  We used the standard deviation predictions to create Gaussian-shaped prediction intervals around each test point, and then we compared these intervals to the models' residuals at these points.
+If the residuals tended to fall outside the prediction intervals too often, then the UQs were considered overconfident.
+If the residuals tended to fall inside the prediction intervals too often, then the UQs were considered underconfident.
+Thus ``well-calibrated'' models had residuals that created a Gaussian distribution whose standard deviation was close to the model's predicted standard deviations.
+We discuss calibration curves in more detail in the Results section alongside specific examples.
+
+As \citet{Kuleshov2018} also pointed out, well-calibrated models are necessary but not sufficient for useful UQs.
+For example:  A well-calibrated model could still have large uncertainty estimates, which are inherently less useful than well-calibrated and small uncertainty estimates.
+This idea of having small uncertainty estimates is called ``sharpness'', and \citet{Kuleshov2018} define it with Equation~\ref{eq:og_sharpness}
+
+\begin{equation}\label{eq:og_sharpness}
+    sha = \frac{1}{N} \sum_{n=1}^{N} var(F_n)
+\end{equation}
+
+\noindent where $var(F_n)$ is the variance of the cumulative distribution function $F$ at point $n$.
+This is akin to the average variance of the uncertainty estimates on the test set.
+Here we propose a new formulation (Equation~\ref{eq:sharpness}) where we add a square root operation.
+This operation gives the sharpness the same units as the predictions, which provides us with a more intuitive reference in the magnitude of the sharpness values.
+
+\begin{equation}\label{eq:sharpness}
+    sha = \sqrt{\frac{1}{N} \sum_{n=1}^{N} var(F_n)}
+\end{equation}
 
 
 %%%%%%%%%%%%%%%%%%%% Results %%%%%%%%%%%%%%%%%%%%
@@ -137,14 +176,14 @@ After tuning, we calculated the training set results and present them in this pa
 \section{Results}
 
 \begin{enumerate}
-    \item{Table/figure of accuracies: MSE, MAE, R2, [willie get list]}
+    \item{Table/figure of metrics}
     \item{Plots:}
         \begin{enumerate}
-            \item{Parity plots}
-            \item{Calibration/sharpness plots}
-            \item{Sharpness values per method}
+            \item{parity}
+            \item{calibration}
+            \item{sharpness}
         \end{enumerate}
-    \item{Blocking results?}
+    \item{Blocking results on best candidates (maybe put in SI)}
     \item{Cost of computing each method (if it’s there)}
     \item{Human overhead and difficulty}
 \end{enumerate}
@@ -154,7 +193,8 @@ After tuning, we calculated the training set results and present them in this pa
 
 \section{Conclusions}
 
-Observations about relative accuracies, calibrations, sharpnesses, overhead
+Observations about relative accuracies, calibrations, sharpnesses, overhead.
+Note that we did not do any calibration, and possibly provide references on how to do that if you wanted to.
 
 
 %%%%%%%%%%%%%%%%%%%% Misc %%%%%%%%%%%%%%%%%%%%
