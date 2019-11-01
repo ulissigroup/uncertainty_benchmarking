@@ -1,42 +1,48 @@
 \documentclass[]{achemso}
 
 \usepackage{amsmath}        % Equation editing using flags of \begin{align} and \end{align}
+\usepackage{commath}        % We have this here to use the \abs{} equation function
 \usepackage{graphicx}       % Display figures using \includegraphics
 \graphicspath{{figures/}}   % Location for figures relative to .tex file path
 \usepackage{etoolbox}       % Make the bibliograph unjustified (to work around hbox errors)
 \apptocmd{\thebibliography}{\raggedright}{}{}
 \usepackage{glossaries}     % Enable the \newacronym and \gls commands to reference terms
 
-\newacronym{DFT}{DFT}{density functional theory}
-\newacronym{FCC}{FCC}{face-centered cubic}
+\newacronym{DFT}{DFT}{Density Functional Theory}
 \newacronym{VASP}{VASP}{the Vienna Ab-initio Simulation Package}
 \newacronym{GASpy}{GASpy}{the Generalized Adsorption Simulator for Python}
 \newacronym{rPBE}{rPBE}{revised Perdew-Burke-Ernzerhof}
 \newacronym{ASE}{ASE}{the Atomic Simulation Environment}
-
+\newacronym{NEB}{NEB}{nudged elastic band}
+\newacronym{GP}{GP}{Gaussian Process}
+\newacronym{UQ}{UQ}{uncertainty quantification}
+\newacronym{MAE}{MAE}{Mean Absolute Error}
+\newacronym{RMSE}{RMSE}{Root Mean Squared Error}
+\newacronym{MDAE}{MDAE}{Median Absolute Deviation}
+\newacronym{MARPD}{MARPD}{Mean Absolute Relative Percent Difference}
+\newacronym{R2}{R\textsuperscript{2}}{R\textsuperscript{2} correlation coefficient}
+\newacronym{Pearson}{Pearson's}{Pearson product-moment correlation coefficent}
 
 %\usepackage{booktabs}       % Use table things like \toprule or \bottomrule
 %\usepackage[table]{xcolor}  % Lets us use \rowcolors to make alternate table shading
 %\usepackage{makecell}       % Allow the use of the \makecell command that lets linebreaks in table cells
 %\usepackage{pdflscape}      % Enable the \begin{landscape} command
 
-% chktex-file 36
-
 
 %%%%%%%%%%%%%%%%%%%% Title/Abstract %%%%%%%%%%%%%%%%%%%%
-\title{Uncertainty Benchmark (placeholder)}
+\title{Uncertainty quantification in deep networks for material property predictions}
 \author{Kevin Tran}
-\affiliation{Department of Chemical Engineering, Carnegie Mellon University, Pittsburgh, PA 15217}
+\affiliation{Chemical Engineering Department, Carnegie Mellon University, Pittsburgh, PA 15217}
 \altaffiliation{These authors contributed equally to this work}
 \author{Willie Neiswanger}
 \affiliation{Machine Learning Department, Carnegie Mellon University, Pittsburgh, PA 15217}
 \altaffiliation{These authors contributed equally to this work}
 \author{Junwoong Yoon}
-\affiliation{Department of Chemical Engineering, Carnegie Mellon University, Pittsburgh, PA 15217}
+\affiliation{Chemical Engineering Department, Carnegie Mellon University, Pittsburgh, PA 15217}
 \author{Eric Xing}
 \affiliation{Machine Learning Department, Carnegie Mellon University, Pittsburgh, PA 15217}
 \author{Zachary W. Ulissi}
-\affiliation{Department of Chemical Engineering, Carnegie Mellon University, Pittsburgh, PA 15217}
+\affiliation{Chemical Engineering Department, Carnegie Mellon University, Pittsburgh, PA 15217}
 \email{zulissi@andrew.cmu.edu}
 
 \begin{document}
@@ -62,17 +68,23 @@
 
 \section{Introduction}
 
-\begin{enumerate}
-    \item{ML/DS + catalysis}
+The fields of catalysis and materials science are burgeoning with research articles that use machine learning and data science to screen, design, and understand materials.\cite{Medford2018, Gu2019, Schleder2019, Alberi2019}
+This research has spurned the creation of machine learning models to predict various material properties.
+Unfortunately, the design spaces for these models are sometimes too large and intractable to sample completely.
+These undersampling issues can limit the training data and therefore the predictive power of the models.
+It would be helpful to have an \gls{UQ} for a model so that we know when to trust the predictions and when not to.
+More specifically:  \gls{UQ} would enable various online, active frameworks for materials discovery and design (e.g., active learning,\cite{Settles2012} online active learning,\cite{Chu2011} Bayesian optimization,\cite{Frazier2018} active search,\cite{Garnett2012} or goal oriented design of experiments\cite{Kandasamy}).
 
-    \item{Why uncertainty?}
-        \begin{enumerate}
-            \item{want confidence on DFT predictions themselves}
-            \item{active routines}
-        \end{enumerate}
+Such active frameworks have already been used successfully in the field of catalysis and materials informatics.
+For example:  \citet{Peterson2016} has used a neural network to perform online active learning of \gls{NEB} calculations, reducing the number of force calls by an order of magnitude.
+\citet{Torres2018} have used also used online active learning to accelerate \gls{NEB} calculations, but they used a \gls{GP} model instead of a neural network.
+\citet{Jinnouchi2019} have used online active learning to accelerate molecular dynamics simulations.
+Each of these active methods are underpinned by models with \gls{UQ}, which has garnered increasing attention itself.\cite{Peterson2017, Musil2019}
 
-    \item{Very quick overview of the paper (Figure~\ref{fig:overview})}
-\end{enumerate}
+To our knowledge though, we have not seen many comparisons of different methods for \gls{UQ} within the field of catalysis and materials informatics.
+Here we attempt to resolve this issue by benchmarking six different methods for \gls{UQ} (Figure~\ref{fig:overview}).
+We acknowledge that there will not be one optimal method across all use cases, but we still find value in sharing these results so that others can build intuition from our results.
+Perhaps more importantly, we have also established a protocol for comparing the performance of different modeling and \gls{UQ} methods.
 
 \begin{figure}
     \centering
@@ -100,29 +112,63 @@ The bottom layers of each slab were fixed and defined as those atoms more than 3
 To split the data into train/validate/test sets, we first enumerated all adsorption energies on monometallic slabs and added them to the training set manually. 
 We did this because some of the regression methods in this paper use a featurization that contains our monometallic adsorption energy data\cite{Tran2018}, and so having the monometallic adsorption energies pre-allocated in the training set prevented any information leakage between the training set and validation/test sets.
 After this allocation, we performed a 64/14/20 train/validate/test split that was stratified\cite{Thompson2012} by adsorbate.
-We used the train/validate partitions to tune various hyperparameters manually.
-To create the results shown in this paper, we combined the training and validation partitions into a single training set and reported models' performances on the held-out training set.
+We then used the validation set's results to tune various hyperparameters manually.
+After tuning, we calculated the training set results and present them in this paper exclusively.
+
+\subsection{Regression methods}
 
 \begin{enumerate}
-    \item{Modeling}
-        \begin{enumerate}
-            \item{CGCNN}
-            \item{CGCNN Ensemble}
-            \item{GP}
-            \item{GP with CGCNN}
-            \item{With other kernels too}
-            \item{Penultimate-Fed GP}
-            \item{Bayesian CGCNN with prior on weights at some layer}
-            \item{Supervised error prediction (delta CGCNN)}
-            \item{Dropout CGCNN}
-        \end{enumerate}
-    \item{Assessment}
-        \begin{enumerate}
-            \item{accuracy}
-            \item{calibration}
-            \item{sharpness}
-        \end{enumerate}
+    \item{CGCNN}
+    \item{CGCNN Ensemble}
+    \item{GP}
+    \item{GP with CGCNN}
+    \item{With other kernels too}
+    \item{Penultimate-Fed GP}
+    \item{Bayesian CGCNN with prior on weights at some layer}
+    \item{Supervised error prediction (delta CGCNN)}
+    \item{Dropout CGCNN}
 \end{enumerate}
+
+\subsection{Performance metrics}
+
+We used six different metrics to quantify the accuracy of the various models:  \gls{MAE}, \gls{RMSE}, \gls{MDAE}, \gls{MARPD}, \gls{R2}, and \gls{Pearson}.
+\gls{MARPD} values were calculated with Equation~\ref{eq:marpd}
+
+\begin{equation}\label{eq:marpd}
+    MARPD = \frac{1}{N} \sum_{i=1}^{N} \abs{100 \cdot \frac{\hat{x}_n - x_n}{\abs{\hat{x}_n} + \abs{x_n}}}
+\end{equation}
+
+\noindent where $n$ is the index of a data point, $N$ is the total number of data points, $x_n$ is the true value of the data point, and $\hat{x}_n$ is the model's estimate of $x_n$.
+In this case, $x_n$ is a DFT-calculated adsorption energy and $\hat{x}_n$ is the surrogate-model-calculated adsorption energy.
+We used \gls{MDAE} because is insensitive to outliers and is therefore a good measure of accuracy for the majority of the data.
+We used \gls{RMSE} because it is sensitive to outliers and is therefore a good measure of worst-case accuracy.
+We used \gls{MAE} because it lies between \gls{MDAE} and \gls{RMSE} in terms of sensitivity to outliers.
+We used \gls{MARPD}, \gls{R2}, and \gls{Pearson} because they provide normalized measures of accuracy that may be more interpretable for those unfamiliar with adsorption energy measurements in eV.
+The ensemble of these metrics provide a more robust view of accuracy than any one metric can provide alone.
+
+To assess the calibration (or ``honesty'') of these models' UQs, we created calibration curves. A calibration curve ``displays the true frequency of points in each [prediction] interval relative to the predicted fraction of points in that interval'', as outlined by \citet{Kuleshov2018}.
+In other words:  We used the standard deviation predictions to create Gaussian-shaped prediction intervals around each test point, and then we compared these intervals to the models' residuals at these points.
+If the residuals tended to fall outside the prediction intervals too often, then the UQs were considered overconfident.
+If the residuals tended to fall inside the prediction intervals too often, then the UQs were considered underconfident.
+Thus ``well-calibrated'' models had residuals that created a Gaussian distribution whose standard deviation was close to the model's predicted standard deviations.
+We discuss calibration curves in more detail in the Results section alongside specific examples.
+
+As \citet{Kuleshov2018} also pointed out, well-calibrated models are necessary but not sufficient for useful UQs.
+For example:  A well-calibrated model could still have large uncertainty estimates, which are inherently less useful than well-calibrated and small uncertainty estimates.
+This idea of having small uncertainty estimates is called ``sharpness'', and \citet{Kuleshov2018} define it with Equation~\ref{eq:og_sharpness}
+
+\begin{equation}\label{eq:og_sharpness}
+    sha = \frac{1}{N} \sum_{n=1}^{N} var(F_n)
+\end{equation}
+
+\noindent where $var(F_n)$ is the variance of the cumulative distribution function $F$ at point $n$.
+This is akin to the average variance of the uncertainty estimates on the test set.
+Here we propose a new formulation (Equation~\ref{eq:sharpness}) where we add a square root operation.
+This operation gives the sharpness the same units as the predictions, which provides us with a more intuitive reference in the magnitude of the sharpness values.
+
+\begin{equation}\label{eq:sharpness}
+    sha = \sqrt{\frac{1}{N} \sum_{n=1}^{N} var(F_n)}
+\end{equation}
 
 
 %%%%%%%%%%%%%%%%%%%% Results %%%%%%%%%%%%%%%%%%%%
@@ -130,14 +176,14 @@ To create the results shown in this paper, we combined the training and validati
 \section{Results}
 
 \begin{enumerate}
-    \item{Table/figure of accuracies: MSE, MAE, R2, [willie get list]}
+    \item{Table/figure of metrics}
     \item{Plots:}
         \begin{enumerate}
-            \item{Parity plots}
-            \item{Calibration/sharpness plots}
-            \item{Sharpness values per method}
+            \item{parity}
+            \item{calibration}
+            \item{sharpness}
         \end{enumerate}
-    \item{Blocking results?}
+    \item{Blocking results on best candidates (maybe put in SI)}
     \item{Cost of computing each method (if it’s there)}
     \item{Human overhead and difficulty}
 \end{enumerate}
@@ -147,7 +193,8 @@ To create the results shown in this paper, we combined the training and validati
 
 \section{Conclusions}
 
-Observations about relative accuracies, calibrations, sharpnesses, overhead
+Observations about relative accuracies, calibrations, sharpnesses, overhead.
+Note that we did not do any calibration, and possibly provide references on how to do that if you wanted to.
 
 
 %%%%%%%%%%%%%%%%%%%% Misc %%%%%%%%%%%%%%%%%%%%

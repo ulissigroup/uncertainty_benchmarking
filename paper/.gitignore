@@ -5,3 +5,5 @@ acs-*.bib
 *.fdb_latexmk
 *.fls
 *.synctex.gz
+*.out
+*.swp
