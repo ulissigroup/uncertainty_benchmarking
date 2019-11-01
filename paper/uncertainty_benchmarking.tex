@@ -22,6 +22,10 @@
 \newacronym{MARPD}{MARPD}{Mean Absolute Relative Percent Difference}
 \newacronym{R2}{R\textsuperscript{2}}{R\textsuperscript{2} correlation coefficient}
 \newacronym{Pearson}{Pearson's}{Pearson product-moment correlation coefficent}
+\newacronym{CGCNN}{CGCNN}{Crystal Graph Convolutional Neural Network}
+\newacronym{BNN}{BNN}{Bayesian Neural Network}
+\newacronym{MLE}{MLE}{Maximum Likelihood Estimation}
+\newacronym{PFGP}{PFGP}{Penultimate-Fed Gaussian Process}
 
 %\usepackage{booktabs}       % Use table things like \toprule or \bottomrule
 %\usepackage[table]{xcolor}  % Lets us use \rowcolors to make alternate table shading
@@ -68,7 +72,7 @@
 
 \section{Introduction}
 
-The fields of catalysis and materials science are burgeoning with research articles that use machine learning and data science to screen, design, and understand materials.\cite{Medford2018, Gu2019, Schleder2019, Alberi2019}
+The fields of catalysis and materials science are burgeoning with methods to screen, design, and understand materials.\cite{Medford2018, Gu2019, Schleder2019, Alberi2019}
 This research has spurned the creation of machine learning models to predict various material properties.
 Unfortunately, the design spaces for these models are sometimes too large and intractable to sample completely.
 These undersampling issues can limit the training data and therefore the predictive power of the models.
@@ -80,6 +84,8 @@ For example:  \citet{Peterson2016} has used a neural network to perform online a
 \citet{Torres2018} have used also used online active learning to accelerate \gls{NEB} calculations, but they used a \gls{GP} model instead of a neural network.
 \citet{Jinnouchi2019} have used online active learning to accelerate molecular dynamics simulations.
 Each of these active methods are underpinned by models with \gls{UQ}, which has garnered increasing attention itself.\cite{Peterson2017, Musil2019}
+
+% TODO: Willie to make overview of predictive uncertainty
 
 To our knowledge though, we have not seen many comparisons of different methods for \gls{UQ} within the field of catalysis and materials informatics.
 Here we attempt to resolve this issue by benchmarking six different methods for \gls{UQ} (Figure~\ref{fig:overview}).
@@ -109,7 +115,7 @@ Slabs were replicated in the X/Y directions so that each cell was at least 4.5 \
 Slabs were also replicated in the Z direction until they were at least 7 \AA{} thick, and at least 20 \AA{} of vacuum was included in between slabs.
 The bottom layers of each slab were fixed and defined as those atoms more than 3 \AA{} from the top of the surface in the scaled Z direction.
 
-To split the data into train/validate/test sets, we first enumerated all adsorption energies on monometallic slabs and added them to the training set manually. 
+To split the data into train/validate/test sets, we enumerated all adsorption energies on monometallic slabs and added them to the training set manually. 
 We did this because some of the regression methods in this paper use a featurization that contains our monometallic adsorption energy data\cite{Tran2018}, and so having the monometallic adsorption energies pre-allocated in the training set prevented any information leakage between the training set and validation/test sets.
 After this allocation, we performed a 64/14/20 train/validate/test split that was stratified\cite{Thompson2012} by adsorbate.
 We then used the validation set's results to tune various hyperparameters manually.
@@ -117,17 +123,54 @@ After tuning, we calculated the training set results and present them in this pa
 
 \subsection{Regression methods}
 
-\begin{enumerate}
-    \item{CGCNN}
-    \item{CGCNN Ensemble}
-    \item{GP}
-    \item{GP with CGCNN}
-    \item{With other kernels too}
-    \item{Penultimate-Fed GP}
-    \item{Bayesian CGCNN with prior on weights at some layer}
-    \item{Supervised error prediction (delta CGCNN)}
-    \item{Dropout CGCNN}
-\end{enumerate}
+% TODO:  Willie to make intro to predictive uncertainty methods.
+% TODO:  We should have a diagram that outlines these method. Kevin can give it a shot.
+
+\textbf{\gls{CGCNN}:}
+To establish a baseline for predictive accuracy, we re-trained a previously reported \gls{CGCNN}\cite{Xie2018, Back2019} on this study's training set.
+This \gls{CGCNN} model projects a three-dimensional atomic structure into a graph, which is then fed into a convolutional neural network to predict various properties.
+In this case, we predict \gls{DFT}-calculated adsorption energies, $\Delta$E.
+Reference \citet{Back2019} for additional details.
+
+\textbf{\gls{CGCNN} Ensemble:}
+We created an ensemble of \gls{CGCNN}s by K-fold subsampling the training data into five different folds and then training individual \gls{CGCNN} models on each of these folds.
+Thus the mean of each of these models' predictions is the final prediction of the ensemble, and the standard deviation of the individual predictions is the ensemble's estimate of uncertainty.
+% TODO:  Willie to provide justification for subsampling method. And maybe a reference for K-folding?
+
+\textbf{\gls{BNN}:}
+% TODO:  Jun
+
+\textbf{Supervised error prediction (delta CGCNN):}
+% TODO:  Willie
+
+\textbf{\gls{GP}:}
+\gls{GP}s are one of the most common regression methods for producing \gls{UQ}s, and so we use them here as a baseline.
+We fit a standard \gls{GP} using the same exact features that we used in previous work.\cite{Tran2018}
+These features are defined by the elements coordinated with the adsorbate and by the elements of its next-nearest neighbors.
+Specifically:  We use the atomic numbers of these elements, their Pauling electronegativity, a count of the number of atoms of each element near the adsorbate, and the median adsorption energy between the adsorbate and the elements.
+To ensure that these features interacted well with the \gls{GP}'s kernel, we normalized each of the features to have a mean of zero and standard deviation of one.
+Reference \citet{Tran2018} for additional details.
+To define the GP, we assumed a constant mean and used a Matern covariance kernel.
+We trained the length scale of the Matern kernel using the \gls{MLE} method with a Gaussian likelihood.
+All GP training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
+% TODO:  Willie double-check the wording here. I think we use a Gaussian likelihood, but does make it no longer MLE? You know best.
+
+\textbf{\gls{GP} with \gls{CGCNN}-predicted mean:}
+% TODO:  Willie
+
+\textbf{\gls{PFGP}}
+A limitation of using this formulation of a \gls{GP} with \gls{CGCNN}-predicted mean is that it requires the use of hand-crafted features for the \gls{GP}.
+This requirement reduces the transferability of the method to other applications where such features may not be readily available.
+To address this, we formulated a different method whereby we first train a neural network on the learning task (i.e., predict adsorption energies), and then we use the outputs of the penultimate layer of the network as features in a new \gls{GP}.
+The \gls{GP} would then be trained to use these features to produce both mean and uncertainty predictions on the adsorption energies.
+We call this a \gls{PFGP}.
+In this case, we used the baseline \gls{CGCNN} as the network from which we obtained the penultimate outputs.
+We also normalized the penultimate outputs of the \gls{CGCNN} so that each output would have a mean of zero and a standard deviation of one.
+To define the \gls{GP}, we assumed a constant mean and used a Matern covariance kernel.
+We trained the length scale of the Matern kernel using the \gls{MLE} method with a Gaussian likelihood.
+All GP training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
+% TODO:  Willie double-check the wording here. I think we use a Gaussian likelihood, but does make it no longer MLE? You know best.
+
 
 \subsection{Performance metrics}
 
@@ -193,8 +236,7 @@ This operation gives the sharpness the same units as the predictions, which prov
 
 \section{Conclusions}
 
-Observations about relative accuracies, calibrations, sharpnesses, overhead.
-Note that we did not do any calibration, and possibly provide references on how to do that if you wanted to.
+% TODO:  Kevin Observations about relative accuracies, calibrations, sharpnesses, overhead. Note that we did not do any calibration, and possibly provide references on how to do that if you wanted to.
 
 
 %%%%%%%%%%%%%%%%%%%% Misc %%%%%%%%%%%%%%%%%%%%
@@ -206,8 +248,7 @@ The code dependencies are listed inside the repository.
 The authors declare no competing financial interest.
 
 \section*{Acknowledgements} This research used resources of the National Energy Research Scientific Computing Center, a DOE Office of Science User Facility supported by the Office of Science of the U.S. Department of Energy under Contract No. DE-AC02-05CH11231. % chktex 8
-% TODO add credit to NESAP
-% TODO add credit to Willie's cluster
+We also acknowledge the exceptional documentation and clear examples in the GPyTorch\cite{Gardner2018} repository, which formed the basis on much of the \gls{GP} code used for this work.
 
 
 %%%%%%%%%%%%%%%%%%%% Bibliography %%%%%%%%%%%%%%%%%%%%
