@@ -24,12 +24,15 @@
 \newacronym{MDAE}{MDAE}{Median Absolute Error}
 \newacronym{MARPD}{MARPD}{Mean Absolute Relative Percent Difference}
 \newacronym{R2}{R\textsuperscript{2}}{R\textsuperscript{2} correlation coefficient}
-\newacronym{Pearson}{Pearson's}{Pearson product-moment correlation coefficent}
-\newacronym{CGCNN}{CGCNN}{Crystal Graph Convolutional Neural Network}
+\newacronym{Pearson}{PMCC}{Pearson product-moment correlation coefficent}
+\newacronym{NN}{NN}{crystal graph convolutional Neural Network}
 \newacronym{BNN}{BNN}{Bayesian Neural Network}
 \newacronym{MLE}{MLE}{Maximum Likelihood Estimation}
 \newacronym{PFGP}{PFGP}{Penultimate-Fed Gaussian Process}
+\newacronym{dNN}{NN$\Delta$NN}{in-tandem NNs}
+\newacronym{dGP}{NN$\Delta$GP}{in-tandem NN \& GP}
 \newacronym{ML}{ML}{Machine Learning}
+\newacronym{eV}{eV}{electron volts}
 
 
 %%%%%%%%%%%%%%%%%%%% Title/Abstract %%%%%%%%%%%%%%%%%%%%
@@ -103,8 +106,8 @@ All regressions in this paper were performed on a dataset of \gls{DFT} calculate
 These data included energies from 21,269 different H adsorption sites; 1,594 N sites; 18,437 CO sites; 2,515 O sites; and 3,464 OH sites; totaling in 47,279 data points.
 \gls{GASpy} performed all \gls{DFT} calculations using \gls{VASP}\cite{Kresse1993, Kresse1994, Kresse1996, Kresse1996a} version 5.4 implemented in \gls{ASE}\cite{HjorthLarsen2017}.
 The \gls{rPBE} functionals\cite{Hammer1999} were used along with \gls{VASP}'s pseudopotentials, and no spin magnetism or dispersion corrections were used.
-Bulk relaxations were performed with a $10\times10\times10$ k-point grid and a 500 eV cutoff, and only isotropic relaxation were allowed during this bulk relaxation.
-Slab relaxations were performed with k-point grids of $4\times4\times1$ and a 350 eV cutoff.
+Bulk relaxations were performed with a $10\times10\times10$ k-point grid and a 500 \gls{eV} cutoff, and only isotropic relaxation were allowed during this bulk relaxation.
+Slab relaxations were performed with k-point grids of $4\times4\times1$ and a 350 \gls{eV} cutoff.
 Slabs were replicated in the X/Y directions so that each cell was at least 4.5 \AA{} wide, which reduces adsorbate self-interaction.
 Slabs were also replicated in the Z direction until they were at least 7 \AA{} thick, and at least 20 \AA{} of vacuum was included in between slabs.
 The bottom layers of each slab were fixed and defined as those atoms more than 3 \AA{} from the top of the surface in the scaled Z direction.
@@ -134,24 +137,26 @@ Figure~\ref{fig:methods} illustrates all the methods we investigated in this stu
     }\label{fig:methods}
 \end{figure}
 
-\textbf{\gls{CGCNN}:}
-To establish a baseline for predictive accuracy, we re-trained a previously reported \gls{CGCNN}\cite{Xie2018, Back2019} on this study's training set.
-This \gls{CGCNN} model projects a three-dimensional atomic structure into a graph, which is then fed into a convolutional neural network to predict various properties.
+\textbf{\glsentrytext{NN}:}
+To establish a baseline for predictive accuracy, we re-trained a previously reported \gls{NN}\cite{Xie2018, Back2019} on this study's training set.
+This \gls{NN} model projects a three-dimensional atomic structure into a graph, which is then fed into a convolutional neural network to predict various properties.
 In this case, we predict \gls{DFT}-calculated adsorption energies, $\Delta$E.
 Reference \citet{Back2019} for additional details.
 
-\textbf{\gls{CGCNN} Ensemble:}
-We created an ensemble of \gls{CGCNN}s by K-fold subsampling the training data into five different folds and then training individual \gls{CGCNN} models on each of these folds.
+\textbf{\glsentrytext{NN} Ensemble:}
+We created an ensemble of \gls{NN}s by K-fold subsampling the training data into five different folds and then training individual \gls{NN} models on each of these folds.
 Thus the mean of each of these models' predictions is the final prediction of the ensemble, and the standard deviation of the individual predictions is the ensemble's estimate of uncertainty.
 % TODO:  Willie to provide justification for subsampling method. And maybe a reference for K-folding?
 
-\textbf{\gls{BNN}:}
+\textbf{\glsentrytext{BNN}:}
+Something about \gls{BNN}.
 % TODO:  Jun
 
-\textbf{Supervised error prediction (delta CGCNN):}
+\textbf{\glsentrytext{dNN}:}
+Something about \gls{dNN}
 % TODO:  Willie
 
-\textbf{\gls{GP}:}
+\textbf{\glsentrytext{GP}:}
 \gls{GP}s are one of the most common regression methods for producing \gls{UQ}s, and so we use them here as a baseline.
 We fit a standard \gls{GP} using the same exact features that we used in previous work.\cite{Tran2018}
 These features are defined by the elements coordinated with the adsorbate and by the elements of its next-nearest neighbors.
@@ -163,17 +168,18 @@ We trained the length scale of the Matern kernel using the \gls{MLE} method with
 All GP training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
 % TODO:  Willie double-check the wording here. I think we use a Gaussian likelihood, but does make it no longer MLE? You know best.
 
-\textbf{\gls{GP} with \gls{CGCNN}-predicted mean:}
+\textbf{\glsentrytext{dGP}:}
+Something about \gls{dGP}
 % TODO:  Willie
 
-\textbf{\gls{PFGP}:}
-A limitation of using this formulation of a \gls{GP} with \gls{CGCNN}-predicted mean is that it requires the use of hand-crafted features for the \gls{GP}.
+\textbf{\glsentrytext{PFGP}:}
+A limitation of using this formulation of a \gls{GP} with \gls{NN}-predicted mean is that it requires the use of hand-crafted features for the \gls{GP}.
 This requirement reduces the transferability of the method to other applications where such features may not be readily available.
 To address this, we formulated a different method whereby we first train a neural network on the learning task (i.e., predict adsorption energies), and then we use the outputs of the penultimate layer of the network as features in a new \gls{GP}.
 The \gls{GP} would then be trained to use these features to produce both mean and uncertainty predictions on the adsorption energies.
 We call this a \gls{PFGP}.
-In this case, we used the baseline \gls{CGCNN} as the network from which we obtained the penultimate outputs.
-We also normalized the penultimate outputs of the \gls{CGCNN} so that each output would have a mean of zero and a standard deviation of one.
+In this case, we used the baseline \gls{NN} as the network from which we obtained the penultimate outputs.
+We also normalized the penultimate outputs of the \gls{NN} so that each output would have a mean of zero and a standard deviation of one.
 To define the \gls{GP}, we assumed a constant mean and used a Matern covariance kernel.
 We trained the length scale of the Matern kernel using the \gls{MLE} method with a Gaussian likelihood.
 All GP training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
@@ -182,20 +188,18 @@ All GP training and predictions were done with GPU acceleration as implemented i
 
 \subsection{Performance metrics}
 
-We used six different metrics to quantify the accuracy of the various models:  \gls{MAE}, \gls{RMSE}, \gls{MDAE}, \gls{MARPD}, \gls{R2}, and \gls{Pearson}.
-\gls{MARPD} values were calculated with Equation~\ref{eq:marpd}
+We used six different metrics to quantify the accuracy of the various models:  \gls{MDAE}, \gls{RMSE}, \gls{MAE}, \gls{MARPD}, \gls{R2}, and \gls{Pearson}.
+We used \gls{MDAE} because is insensitive to outliers and is therefore a good measure of accuracy for the majority of the data.
+We used \gls{RMSE} because it is sensitive to outliers and is therefore a good measure of worst-case accuracy.
+We used \gls{MAE} because it lies between \gls{MDAE} and \gls{RMSE} in terms of sensitivity to outliers.
+We used \gls{MARPD}, \gls{R2}, and \gls{Pearson} because they provide normalized measures of accuracy that may be more interpretable for those unfamiliar with adsorption energy measurements in \gls{eV}.
+\gls{MARPD} values were calculated with Equation~\ref{eq:marpd} where $n$ is the index of a data point, $N$ is the total number of data points, $x_n$ is the true value of the data point, and $\hat{x}_n$ is the model's estimate of $x_n$.
+In this case, $x_n$ is a DFT-calculated adsorption energy and $\hat{x}_n$ is the surrogate-model-calculated adsorption energy.
+The ensemble of these metrics provide a more robust view of accuracy than any one metric can provide alone.
 
 \begin{equation}\label{eq:marpd}
     MARPD = \frac{1}{N} \sum_{i=1}^{N} \abs{100 \cdot \frac{\hat{x}_n - x_n}{\abs{\hat{x}_n} + \abs{x_n}}}
 \end{equation}
-
-\noindent where $n$ is the index of a data point, $N$ is the total number of data points, $x_n$ is the true value of the data point, and $\hat{x}_n$ is the model's estimate of $x_n$.
-In this case, $x_n$ is a DFT-calculated adsorption energy and $\hat{x}_n$ is the surrogate-model-calculated adsorption energy.
-We used \gls{MDAE} because is insensitive to outliers and is therefore a good measure of accuracy for the majority of the data.
-We used \gls{RMSE} because it is sensitive to outliers and is therefore a good measure of worst-case accuracy.
-We used \gls{MAE} because it lies between \gls{MDAE} and \gls{RMSE} in terms of sensitivity to outliers.
-We used \gls{MARPD}, \gls{R2}, and \gls{Pearson} because they provide normalized measures of accuracy that may be more interpretable for those unfamiliar with adsorption energy measurements in eV.
-The ensemble of these metrics provide a more robust view of accuracy than any one metric can provide alone.
 
 To assess the calibration (or ``honesty'') of these models' UQs, we created calibration curves. A calibration curve ``displays the true frequency of points in each [prediction] interval relative to the predicted fraction of points in that interval'', as outlined by \citet{Kuleshov2018}.
 In other words:  We used the standard deviation predictions to create Gaussian-shaped prediction intervals around each test point, and then we compared these intervals to the models' residuals at these points.
@@ -215,7 +219,8 @@ This idea of having small uncertainty estimates is called ``sharpness'', and \ci
 \noindent where $var(F_n)$ is the variance of the cumulative distribution function $F$ at point $n$.
 This is akin to the average variance of the uncertainty estimates on the test set.
 Here we propose and use a new formulation (Equation~\ref{eq:sharpness}) where we add a square root operation.
-This operation gives the sharpness the same units as the predictions, which provides us with a more intuitive reference in the magnitude of the sharpness values.
+This operation gives the sharpness the same units as the predictions, which provides us with a more intuitive reference.
+In other words:  Sharpness is akin to the average of the \gls{ML}-predicted standard deviations.
 
 \begin{equation}\label{eq:sharpness}
     sha = \sqrt{\frac{1}{N} \sum_{n=1}^{N} var(F_n)}
@@ -226,8 +231,32 @@ This operation gives the sharpness the same units as the predictions, which prov
 
 \section{Results}
 
+Table~\ref{tab:results} lists the performance metrics of all methods we used in this study.
+
+\begin{table}
+    \centering
+    \begin{tabular}{lrrrrrrrr}
+        \toprule
+        Method & \gls{MDAE} & \gls{MAE} & \gls{RMSE} & \gls{MARPD} & \gls{R2} & \gls{Pearson} & MisCal & Sha \\
+        \midrule
+        \gls{NN} & 0.11 & 0.19 & 0.34 & 61 \% & 0.80 & 0.90 & N/A & N/A \\
+        \gls{NN} ensemble & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{BNN} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{dNN} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{GP} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{dGP} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{PFGP} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \bottomrule
+    \end{tabular}
+    \caption{Performance metrics for all methods used in this study, which include:
+        \glsentryfull{MDAE}, \glsentryfull{MAE}, \glsentryfull{RMSE}, \glsentryfull{MARPD},
+        \glsentryfull{R2}, \glsentryfull{Pearson},
+        miscalibration area (MisCal), and sharpness (Sha).
+        The units of \gls{MDAE}, \gls{MAE}, \gls{RMSE}, and Sha are all in \gls{eV}.
+        The units of \gls{MARPD} are in \%.}\label{tab:results}
+\end{table}
+
 \begin{enumerate}
-    \item{Table/figure of metrics}
     \item{Plots:}
         \begin{enumerate}
             \item{parity}
