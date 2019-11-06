@@ -85,7 +85,7 @@ Each of these active methods are underpinned by models with \gls{UQ}, which has 
 % TODO: Willie to make overview of predictive uncertainty
 
 To our knowledge though, we have not seen many comparisons of different methods for \gls{UQ} within the field of catalysis and materials informatics.
-Here we attempt to resolve this issue by benchmarking six different methods for \gls{UQ} (Figure~\ref{fig:overview}).
+Here we attempt to resolve this issue by benchmarking different methods for \gls{UQ} (Figure~\ref{fig:overview}).
 We acknowledge that there will not be one optimal method across all use cases, but we still find value in sharing these results so that others can build intuition from our results.
 Perhaps more importantly, we have also established a protocol for comparing the performance of different modeling and \gls{UQ} methods.
 
@@ -238,30 +238,8 @@ In other words:  Sharpness is akin to the average of the \gls{ML}-predicted stan
 
 \section{Results}
 
-Table~\ref{tab:results} lists the performance metrics of all methods we used in this study.
-
-\begin{table}
-    \centering
-    \begin{tabular}{lrrrrrrrr}
-        \toprule
-        Method & \gls{MDAE} & \gls{MAE} & \gls{RMSE} & \gls{MARPD} & \gls{R2} & \gls{Pearson} & MisCal & Sha \\
-        \midrule
-        \gls{NN} & 0.11 & 0.19 & 0.34 & 61 & 0.80 & 0.90 & N/A & N/A \\
-        \gls{NN} ensemble & foo & foo & foo & foo & foo & foo & foo & foo \\
-        \gls{BNN} & foo & foo & foo & foo & foo & foo & foo & foo \\
-        \gls{dNN} & foo & foo & foo & foo & foo & foo & foo & foo \\
-        \gls{GP} & foo & foo & foo & foo & foo & foo & foo & foo \\
-        \gls{dGP} & foo & foo & foo & foo & foo & foo & foo & foo \\
-        \gls{PFGP} & foo & foo & foo & foo & foo & foo & foo & foo \\
-        \bottomrule
-    \end{tabular}
-    \caption{Performance metrics for all methods used in this study, which include:
-    \glsentryfull{MDAE}, \glsentryfull{MAE}, \glsentryfull{RMSE}, \glsentryfull{MARPD},
-    \glsentryfull{R2}, \glsentryfull{Pearson},
-    miscalibration area (MisCal), and sharpness (Sha).
-    The units of \gls{MDAE}, \gls{MAE}, \gls{RMSE}, and Sha are all in \gls{eV}.
-    The units of \gls{MARPD} are in \%.}\label{tab:results}
-\end{table}
+Figure~\ref{fig:parity} contains parity plots for all \gls{UQ} methods studied here; Figure~\ref{fig:calibration} contains calibration curves; and Figure~\ref{fig:sharpness} contains distribution plots of the \gls{ML}-predicted \gls{UQ}s.
+These figures illustrate the accuracy, calibration, and sharpness of the different \gls{UQ} methods, respectively.
 
 \begin{figure}
     \centering
@@ -289,20 +267,102 @@ Table~\ref{tab:results} lists the performance metrics of all methods we used in 
         \includegraphics[width=\textwidth]{../PFGP/Matern/parity.pdf}
         \caption{\gls{PFGP}}\label{fig:parity_pfgp}
     \end{subfigure}
-    \caption{Parity plots for all six \gls{UQ} methods used in this study.
+    \caption{Parity plots for all \gls{UQ} methods used in this study.
     Shading plots were used in lieu of scatter plots because the large number of test points (8,289) obfuscated patterns.
     Darker shading indicates a higher density of points.
     Logarithm-scale shading was used to accentuate outliers.
     The dashed, diagonal lines indicate parity.}\label{fig:parity}
 \end{figure}
 
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/calibration.pdf}
+        \caption{\gls{NN} ensemble}\label{fig:calibration_nn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/calibration.pdf}  % TODO:  Make and use the real calibration plot here
+        \caption{\gls{BNN}}\label{fig:calibration_bnn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/calibration.pdf}  % TODO:  Make and use the real calibration plot here
+        \caption{\gls{dNN}}\label{fig:calibration_dnn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/calibration.pdf}
+        \caption{\gls{GP}}\label{fig:calibration_gp}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/calibration.pdf}  % TODO:  Make and use the real calibration plot here
+        \caption{\gls{dGP}}\label{fig:calibration_dgp}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../PFGP/Matern/calibration.pdf}
+        \caption{\gls{PFGP}}\label{fig:calibration_pfgp}
+    \end{subfigure}
+    \caption{Calibration curves for all \gls{UQ} methods used in this study.
+    Dashed, blue lines indicate perfect calibration while solid orange lines indicate the experimental calibration of the test set.
+    The blue, shaded area between these lines is defined as the miscalibration area.
+    }\label{fig:calibration}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/sharpness.pdf}
+        \caption{\gls{NN} ensemble}\label{fig:sharpness_nn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/sharpness.pdf}  % TODO:  Make and use the real sharpness plot here
+        \caption{\gls{BNN}}\label{fig:sharpness_bnn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/sharpness.pdf}  % TODO:  Make and use the real sharpness plot here
+        \caption{\gls{dNN}}\label{fig:sharpness_dnn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/sharpness.pdf}
+        \caption{\gls{GP}}\label{fig:sharpness_gp}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/sharpness.pdf}  % TODO:  Make and use the real sharpness plot here
+        \caption{\gls{dGP}}\label{fig:sharpness_dgp}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../PFGP/Matern/sharpness.pdf}
+        \caption{\gls{PFGP}}\label{fig:sharpness_pfgp}
+    \end{subfigure}
+    \caption{Distribution plots of the \gls{ML}-predicted standard deviations for each method.
+    Sharpness values are indicated by vertical lines.}\label{fig:sharpness}
+\end{figure}
+
+Table~\ref{tab:results} summarizes all performance metrics.
+
+\begin{table}
+    \centering
+    \begin{tabular}{lrrrrrrrr}
+        \toprule
+        Method & \gls{MDAE} & \gls{MAE} & \gls{RMSE} & \gls{MARPD} & \gls{R2} & \gls{Pearson} & MisCal & Sha \\
+        \midrule
+        \gls{NN} & 0.11 & 0.19 & 0.34 & 61 & 0.80 & 0.90 & N/A & N/A \\
+        \gls{NN} ensemble & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{BNN} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{dNN} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{GP} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{dGP} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{PFGP} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \bottomrule
+    \end{tabular}
+    \caption{Performance metrics for all methods used in this study, which include:
+    \glsentryfull{MDAE}, \glsentryfull{MAE}, \glsentryfull{RMSE}, \glsentryfull{MARPD},
+    \glsentryfull{R2}, \glsentryfull{Pearson},
+    miscalibration area (MisCal), and sharpness (Sha).
+    The units of \gls{MDAE}, \gls{MAE}, \gls{RMSE}, and sharpness are all in \gls{eV}.
+    The units of \gls{MARPD} are in \%.
+    The remaining metrics are unitless.}\label{tab:results}
+\end{table}
+
 \begin{enumerate}
-    \item{Plots:}
-        \begin{enumerate}
-            \item{parity}
-            \item{calibration}
-            \item{sharpness}
-        \end{enumerate}
     \item{Blocking results on best candidates (maybe put in SI)}
     \item{Cost of computing each method (if it’s there)}
     \item{Human overhead and difficulty}
