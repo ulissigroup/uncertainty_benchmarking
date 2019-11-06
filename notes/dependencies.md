@@ -8,6 +8,7 @@ You will need:
 - PyTorch >= 1.1.0
 - [CGCNN](https://github.com/ulissigroup/cgcnn/tree/sklearn_refactor)
 - [GPyTorch](https://github.com/cornellius-gp/gpytorch) >= 0.3
+- [Pyro](https://github.com/pyro-ppl/pyro) >= 0.5
 - SKLearn >= 0.21
 - Skorch >= 0.6
 - Jupyter >= 1.0
