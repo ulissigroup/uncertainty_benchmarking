@@ -4,6 +4,10 @@
 \usepackage{commath}        % We have this here to use the \abs{} equation function
 \usepackage{graphicx}       % Display figures using \includegraphics
 \graphicspath{{figures/}}   % Location for figures relative to .tex file path
+\usepackage{subcaption}     % Enable the \subfigure command for multi-paneled figures
+\usepackage{booktabs}       % Use table things like \toprule or \bottomrule
+\usepackage[table]{xcolor}  % Lets us use \rowcolors to make alternate table shading
+\usepackage{makecell}       % Allow the use of the \makecell command that lets linebreaks in table cells
 \usepackage{etoolbox}       % Make the bibliograph unjustified (to work around hbox errors)
 \apptocmd{\thebibliography}{\raggedright}{}{}
 \usepackage{glossaries}     % Enable the \newacronym and \gls commands to reference terms
@@ -18,19 +22,18 @@
 \newacronym{UQ}{UQ}{uncertainty quantification}
 \newacronym{MAE}{MAE}{Mean Absolute Error}
 \newacronym{RMSE}{RMSE}{Root Mean Squared Error}
-\newacronym{MDAE}{MDAE}{Median Absolute Deviation}
+\newacronym{MDAE}{MDAE}{Median Absolute Error}
 \newacronym{MARPD}{MARPD}{Mean Absolute Relative Percent Difference}
 \newacronym{R2}{R\textsuperscript{2}}{R\textsuperscript{2} correlation coefficient}
-\newacronym{Pearson}{Pearson's}{Pearson product-moment correlation coefficent}
-\newacronym{CGCNN}{CGCNN}{Crystal Graph Convolutional Neural Network}
+\newacronym{Pearson}{PPMCC}{Pearson Product-Moment Correlation coefficent}
+\newacronym{NN}{NN}{crystal graph convolutional Neural Network}
 \newacronym{BNN}{BNN}{Bayesian Neural Network}
 \newacronym{MLE}{MLE}{Maximum Likelihood Estimation}
 \newacronym{PFGP}{PFGP}{Penultimate-Fed Gaussian Process}
-
-%\usepackage{booktabs}       % Use table things like \toprule or \bottomrule
-%\usepackage[table]{xcolor}  % Lets us use \rowcolors to make alternate table shading
-%\usepackage{makecell}       % Allow the use of the \makecell command that lets linebreaks in table cells
-%\usepackage{pdflscape}      % Enable the \begin{landscape} command
+\newacronym{dNN}{NN$\Delta$NN}{in-tandem NNs}
+\newacronym{dGP}{NN$\Delta$GP}{in-tandem NN \& GP}
+\newacronym{ML}{ML}{Machine Learning}
+\newacronym{eV}{eV}{electron volts}
 
 
 %%%%%%%%%%%%%%%%%%%% Title/Abstract %%%%%%%%%%%%%%%%%%%%
@@ -54,13 +57,7 @@
 %\setlength{\fboxrule}{0 pt}
 %\begin{tocentry}
 %    \includegraphics[width=\textwidth]{TOC/TOC.pdf}
-%    This perspective discusses three common tools used in informatics research:
-%    databases, surrogate modeling, and workflow managers. Although these tools are not
-%    new, they are relatively new in the field of surface science and catalysis. We
-%    discuss how these tools can augment and accelerate surface science research, and we
-%    provide examples from both literature and our own work. We also provide our
-%    perspective on when to use these tools and some best practices to follow when
-%    creating them.
+%    TOC caption here.
 %\end{tocentry}
 
 \begin{abstract}
@@ -73,7 +70,7 @@
 \section{Introduction}
 
 The fields of catalysis and materials science are burgeoning with methods to screen, design, and understand materials.\cite{Medford2018, Gu2019, Schleder2019, Alberi2019}
-This research has spurned the creation of machine learning models to predict various material properties.
+This research has spurned the creation of \gls{ML} models to predict various material properties.
 Unfortunately, the design spaces for these models are sometimes too large and intractable to sample completely.
 These undersampling issues can limit the training data and therefore the predictive power of the models.
 It would be helpful to have an \gls{UQ} for a model so that we know when to trust the predictions and when not to.
@@ -88,10 +85,11 @@ Each of these active methods are underpinned by models with \gls{UQ}, which has 
 % TODO: Willie to make overview of predictive uncertainty
 
 To our knowledge though, we have not seen many comparisons of different methods for \gls{UQ} within the field of catalysis and materials informatics.
-Here we attempt to resolve this issue by benchmarking six different methods for \gls{UQ} (Figure~\ref{fig:overview}).
+Here we attempt to resolve this issue by benchmarking different methods for \gls{UQ} (Figure~\ref{fig:overview}).
 We acknowledge that there will not be one optimal method across all use cases, but we still find value in sharing these results so that others can build intuition from our results.
 Perhaps more importantly, we have also established a protocol for comparing the performance of different modeling and \gls{UQ} methods.
 
+% TODO:  Kevin to make this figure
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{placeholder.png}
@@ -109,8 +107,8 @@ All regressions in this paper were performed on a dataset of \gls{DFT} calculate
 These data included energies from 21,269 different H adsorption sites; 1,594 N sites; 18,437 CO sites; 2,515 O sites; and 3,464 OH sites; totaling in 47,279 data points.
 \gls{GASpy} performed all \gls{DFT} calculations using \gls{VASP}\cite{Kresse1993, Kresse1994, Kresse1996, Kresse1996a} version 5.4 implemented in \gls{ASE}\cite{HjorthLarsen2017}.
 The \gls{rPBE} functionals\cite{Hammer1999} were used along with \gls{VASP}'s pseudopotentials, and no spin magnetism or dispersion corrections were used.
-Bulk relaxations were performed with a $10\times10\times10$ k-point grid and a 500 eV cutoff, and only isotropic relaxation were allowed during this bulk relaxation.
-Slab relaxations were performed with k-point grids of $4\times4\times1$ and a 350 eV cutoff.
+Bulk relaxations were performed with a $10\times10\times10$ k-point grid and a 500 \gls{eV} cutoff, and only isotropic relaxation were allowed during this bulk relaxation.
+Slab relaxations were performed with k-point grids of $4\times4\times1$ and a 350 \gls{eV} cutoff.
 Slabs were replicated in the X/Y directions so that each cell was at least 4.5 \AA{} wide, which reduces adsorbate self-interaction.
 Slabs were also replicated in the Z direction until they were at least 7 \AA{} thick, and at least 20 \AA{} of vacuum was included in between slabs.
 The bottom layers of each slab were fixed and defined as those atoms more than 3 \AA{} from the top of the surface in the scaled Z direction.
@@ -124,70 +122,91 @@ After tuning, we calculated the training set results and present them in this pa
 \subsection{Regression methods}
 
 % TODO:  Willie to make intro to predictive uncertainty methods.
-% TODO:  We should have a diagram that outlines these method. Kevin can give it a shot.
+Figure~\ref{fig:methods} illustrates all the methods we investigated in this study.
 
-\textbf{\gls{CGCNN}:}
-To establish a baseline for predictive accuracy, we re-trained a previously reported \gls{CGCNN}\cite{Xie2018, Back2019} on this study's training set.
-This \gls{CGCNN} model projects a three-dimensional atomic structure into a graph, which is then fed into a convolutional neural network to predict various properties.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{methods.pdf}
+    \caption{Overview of the various \gls{UQ} methods we investigated in this study.
+    $\Delta E$ represents \gls{DFT}-calculated adsorption energies;
+    $\Delta \hat{E}$ represents \gls{ML}-predicted adsorption energies;
+    $UQ$ represents \gls{ML}-predicted uncertainty quantifications;
+    $\mu$ represents the mean of a sample of points;
+    $\sigma$ represents the standard deviation of a sample of points;
+    $\epsilon$ represents the residuals between \gls{DFT} and \gls{ML};
+    and $\hat{\epsilon}$ represents the residuals between \gls{ML}-predicted $\epsilon$ and the actual $\epsilon$.
+    }\label{fig:methods}
+\end{figure}
+
+\textbf{\glsentrytext{NN}:}
+To establish a baseline for predictive accuracy, we re-trained a previously reported \gls{NN}\cite{Xie2018, Back2019} on this study's training set.
+This \gls{NN} model projects a three-dimensional atomic structure into a graph, which is then fed into a convolutional neural network to predict various properties.
 In this case, we predict \gls{DFT}-calculated adsorption energies, $\Delta$E.
 Reference \citet{Back2019} for additional details.
 
-\textbf{\gls{CGCNN} Ensemble:}
-We created an ensemble of \gls{CGCNN}s by K-fold subsampling the training data into five different folds and then training individual \gls{CGCNN} models on each of these folds.
+\textbf{\glsentrytext{NN} Ensemble:}
+We created an ensemble of \gls{NN}s by K-fold subsampling the training data into five different folds and then training individual \gls{NN} models on each of these folds.
 Thus the mean of each of these models' predictions is the final prediction of the ensemble, and the standard deviation of the individual predictions is the ensemble's estimate of uncertainty.
 % TODO:  Willie to provide justification for subsampling method. And maybe a reference for K-folding?
 
-\textbf{\gls{BNN}:}
+\textbf{\glsentrytext{BNN}:}
+Something about \gls{BNN}.
 % TODO:  Jun
 
-\textbf{Supervised error prediction (delta CGCNN):}
+\textbf{\glsentrytext{dNN}:}
+Something about \gls{dNN}
 % TODO:  Willie
 
-\textbf{\gls{GP}:}
+\textbf{\glsentrytext{GP}:}
 \gls{GP}s are one of the most common regression methods for producing \gls{UQ}s, and so we use them here as a baseline.
 We fit a standard \gls{GP} using the same exact features that we used in previous work.\cite{Tran2018}
 These features are defined by the elements coordinated with the adsorbate and by the elements of its next-nearest neighbors.
 Specifically:  We use the atomic numbers of these elements, their Pauling electronegativity, a count of the number of atoms of each element near the adsorbate, and the median adsorption energy between the adsorbate and the elements.
 To ensure that these features interacted well with the \gls{GP}'s kernel, we normalized each of the features to have a mean of zero and standard deviation of one.
 Reference \citet{Tran2018} for additional details.
-To define the GP, we assumed a constant mean and used a Matern covariance kernel.
+To define the \gls{GP}, we assumed a constant mean and used a Matern covariance kernel.
 We trained the length scale of the Matern kernel using the \gls{MLE} method with a Gaussian likelihood.
-All GP training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
+All \gls{GP} training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
 % TODO:  Willie double-check the wording here. I think we use a Gaussian likelihood, but does make it no longer MLE? You know best.
 
-\textbf{\gls{GP} with \gls{CGCNN}-predicted mean:}
-% TODO:  Willie
+\textbf{\glsentrytext{dGP}:}
+\gls{GP}s are Bayesian models, in which a prior distribution is first specified, and then updated given observations, to yield a posterior distribution. 
+The mean of this posterior distribution is used for regression, and the covariance matrix is used for \gls{UQ}. 
+Typically, in lieu of any additional prior knowledge, practitioners will take the prior distribution to have zero-mean. 
+However, we could instead supply an alternative curve for the prior mean, and then perform the usual Bayesian updates to compute the posterior of this \gls{GP} given observations. 
+Here, for the \gls{GP} prior mean, we supply the prediction given by a single pre-trained \gls{NN}. 
+We call this method \gls{dGP}.
+For the \gls{GP}, we used a Matern covariance kernel, where we fit the kernel hyperparameters using \gls{MLE}. 
+All \gls{GP} training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
 
-\textbf{\gls{PFGP}}
-A limitation of using this formulation of a \gls{GP} with \gls{CGCNN}-predicted mean is that it requires the use of hand-crafted features for the \gls{GP}.
+\textbf{\glsentrytext{PFGP}:}
+A limitation of using this formulation of a \gls{GP} with \gls{NN}-predicted mean is that it requires the use of hand-crafted features for the \gls{GP}.
 This requirement reduces the transferability of the method to other applications where such features may not be readily available.
 To address this, we formulated a different method whereby we first train a neural network on the learning task (i.e., predict adsorption energies), and then we use the outputs of the penultimate layer of the network as features in a new \gls{GP}.
 The \gls{GP} would then be trained to use these features to produce both mean and uncertainty predictions on the adsorption energies.
 We call this a \gls{PFGP}.
-In this case, we used the baseline \gls{CGCNN} as the network from which we obtained the penultimate outputs.
-We also normalized the penultimate outputs of the \gls{CGCNN} so that each output would have a mean of zero and a standard deviation of one.
+In this case, we used the baseline \gls{NN} as the network from which we obtained the penultimate outputs.
+We also normalized the penultimate outputs of the \gls{NN} so that each output would have a mean of zero and a standard deviation of one.
 To define the \gls{GP}, we assumed a constant mean and used a Matern covariance kernel.
 We trained the length scale of the Matern kernel using the \gls{MLE} method with a Gaussian likelihood.
-All GP training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
+All \gls{GP} training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
 % TODO:  Willie double-check the wording here. I think we use a Gaussian likelihood, but does make it no longer MLE? You know best.
 
 
 \subsection{Performance metrics}
 
-We used six different metrics to quantify the accuracy of the various models:  \gls{MAE}, \gls{RMSE}, \gls{MDAE}, \gls{MARPD}, \gls{R2}, and \gls{Pearson}.
-\gls{MARPD} values were calculated with Equation~\ref{eq:marpd}
+We used six different metrics to quantify the accuracy of the various models:  \gls{MDAE}, \gls{RMSE}, \gls{MAE}, \gls{MARPD}, \gls{R2}, and \gls{Pearson}.
+We used \gls{MDAE} because is insensitive to outliers and is therefore a good measure of accuracy for the majority of the data.
+We used \gls{RMSE} because it is sensitive to outliers and is therefore a good measure of worst-case accuracy.
+We used \gls{MAE} because it lies between \gls{MDAE} and \gls{RMSE} in terms of sensitivity to outliers.
+We used \gls{MARPD}, \gls{R2}, and \gls{Pearson} because they provide normalized measures of accuracy that may be more interpretable for those unfamiliar with adsorption energy measurements in \gls{eV}.
+\gls{MARPD} values were calculated with Equation~\ref{eq:marpd} where $n$ is the index of a data point, $N$ is the total number of data points, $x_n$ is the true value of the data point, and $\hat{x}_n$ is the model's estimate of $x_n$.
+In this case, $x_n$ is a DFT-calculated adsorption energy and $\hat{x}_n$ is the surrogate-model-calculated adsorption energy.
+The ensemble of these metrics provide a more robust view of accuracy than any one metric can provide alone.
 
 \begin{equation}\label{eq:marpd}
     MARPD = \frac{1}{N} \sum_{i=1}^{N} \abs{100 \cdot \frac{\hat{x}_n - x_n}{\abs{\hat{x}_n} + \abs{x_n}}}
 \end{equation}
-
-\noindent where $n$ is the index of a data point, $N$ is the total number of data points, $x_n$ is the true value of the data point, and $\hat{x}_n$ is the model's estimate of $x_n$.
-In this case, $x_n$ is a DFT-calculated adsorption energy and $\hat{x}_n$ is the surrogate-model-calculated adsorption energy.
-We used \gls{MDAE} because is insensitive to outliers and is therefore a good measure of accuracy for the majority of the data.
-We used \gls{RMSE} because it is sensitive to outliers and is therefore a good measure of worst-case accuracy.
-We used \gls{MAE} because it lies between \gls{MDAE} and \gls{RMSE} in terms of sensitivity to outliers.
-We used \gls{MARPD}, \gls{R2}, and \gls{Pearson} because they provide normalized measures of accuracy that may be more interpretable for those unfamiliar with adsorption energy measurements in eV.
-The ensemble of these metrics provide a more robust view of accuracy than any one metric can provide alone.
 
 To assess the calibration (or ``honesty'') of these models' UQs, we created calibration curves. A calibration curve ``displays the true frequency of points in each [prediction] interval relative to the predicted fraction of points in that interval'', as outlined by \citet{Kuleshov2018}.
 In other words:  We used the standard deviation predictions to create Gaussian-shaped prediction intervals around each test point, and then we compared these intervals to the models' residuals at these points.
@@ -206,8 +225,9 @@ This idea of having small uncertainty estimates is called ``sharpness'', and \ci
 
 \noindent where $var(F_n)$ is the variance of the cumulative distribution function $F$ at point $n$.
 This is akin to the average variance of the uncertainty estimates on the test set.
-Here we propose a new formulation (Equation~\ref{eq:sharpness}) where we add a square root operation.
-This operation gives the sharpness the same units as the predictions, which provides us with a more intuitive reference in the magnitude of the sharpness values.
+Here we propose and use a new formulation (Equation~\ref{eq:sharpness}) where we add a square root operation.
+This operation gives the sharpness the same units as the predictions, which provides us with a more intuitive reference.
+In other words:  Sharpness is akin to the average of the \gls{ML}-predicted standard deviations.
 
 \begin{equation}\label{eq:sharpness}
     sha = \sqrt{\frac{1}{N} \sum_{n=1}^{N} var(F_n)}
@@ -218,14 +238,131 @@ This operation gives the sharpness the same units as the predictions, which prov
 
 \section{Results}
 
+Figure~\ref{fig:parity} contains parity plots for all \gls{UQ} methods studied here; Figure~\ref{fig:calibration} contains calibration curves; and Figure~\ref{fig:sharpness} contains distribution plots of the \gls{ML}-predicted \gls{UQ}s.
+These figures illustrate the accuracy, calibration, and sharpness of the different \gls{UQ} methods, respectively.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/parity.pdf}
+        \caption{\gls{NN} ensemble}\label{fig:parity_nn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/parity.pdf}  % TODO:  Make and use the real parity plot here
+        \caption{\gls{BNN}}\label{fig:parity_bnn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/parity.pdf}  % TODO:  Make and use the real parity plot here
+        \caption{\gls{dNN}}\label{fig:parity_dnn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/parity.pdf}
+        \caption{\gls{GP}}\label{fig:parity_gp}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/parity.pdf}  % TODO:  Make and use the real parity plot here
+        \caption{\gls{dGP}}\label{fig:parity_dgp}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../PFGP/Matern/parity.pdf}
+        \caption{\gls{PFGP}}\label{fig:parity_pfgp}
+    \end{subfigure}
+    \caption{Parity plots for all \gls{UQ} methods used in this study.
+    Shading plots were used in lieu of scatter plots because the large number of test points (8,289) obfuscated patterns.
+    Darker shading indicates a higher density of points.
+    Logarithm-scale shading was used to accentuate outliers.
+    The dashed, diagonal lines indicate parity.}\label{fig:parity}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/calibration.pdf}
+        \caption{\gls{NN} ensemble}\label{fig:calibration_nn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/calibration.pdf}  % TODO:  Make and use the real calibration plot here
+        \caption{\gls{BNN}}\label{fig:calibration_bnn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/calibration.pdf}  % TODO:  Make and use the real calibration plot here
+        \caption{\gls{dNN}}\label{fig:calibration_dnn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/calibration.pdf}
+        \caption{\gls{GP}}\label{fig:calibration_gp}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/calibration.pdf}  % TODO:  Make and use the real calibration plot here
+        \caption{\gls{dGP}}\label{fig:calibration_dgp}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../PFGP/Matern/calibration.pdf}
+        \caption{\gls{PFGP}}\label{fig:calibration_pfgp}
+    \end{subfigure}
+    \caption{Calibration curves for all \gls{UQ} methods used in this study.
+    Dashed, blue lines indicate perfect calibration while solid orange lines indicate the experimental calibration of the test set.
+    The blue, shaded area between these lines is defined as the miscalibration area.
+    }\label{fig:calibration}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/sharpness.pdf}
+        \caption{\gls{NN} ensemble}\label{fig:sharpness_nn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/sharpness.pdf}  % TODO:  Make and use the real sharpness plot here
+        \caption{\gls{BNN}}\label{fig:sharpness_bnn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/sharpness.pdf}  % TODO:  Make and use the real sharpness plot here
+        \caption{\gls{dNN}}\label{fig:sharpness_dnn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/sharpness.pdf}
+        \caption{\gls{GP}}\label{fig:sharpness_gp}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/sharpness.pdf}  % TODO:  Make and use the real sharpness plot here
+        \caption{\gls{dGP}}\label{fig:sharpness_dgp}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../PFGP/Matern/sharpness.pdf}
+        \caption{\gls{PFGP}}\label{fig:sharpness_pfgp}
+    \end{subfigure}
+    \caption{Distribution plots of the \gls{ML}-predicted standard deviations for each method.
+    Sharpness values are indicated by vertical lines.}\label{fig:sharpness}
+\end{figure}
+
+Table~\ref{tab:results} summarizes all performance metrics.
+
+\begin{table}
+    \centering
+    \begin{tabular}{lrrrrrrrr}
+        \toprule
+        Method & \gls{MDAE} & \gls{MAE} & \gls{RMSE} & \gls{MARPD} & \gls{R2} & \gls{Pearson} & MisCal & Sha \\
+        \midrule
+        \gls{NN} & 0.11 & 0.19 & 0.34 & 61 & 0.80 & 0.90 & N/A & N/A \\
+        \gls{NN} ensemble & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{BNN} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{dNN} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{GP} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{dGP} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{PFGP} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \bottomrule
+    \end{tabular}
+    \caption{Performance metrics for all methods used in this study, which include:
+    \glsentryfull{MDAE}, \glsentryfull{MAE}, \glsentryfull{RMSE}, \glsentryfull{MARPD},
+    \glsentryfull{R2}, \glsentryfull{Pearson},
+    miscalibration area (MisCal), and sharpness (Sha).
+    The units of \gls{MDAE}, \gls{MAE}, \gls{RMSE}, and sharpness are all in \gls{eV}.
+    The units of \gls{MARPD} are in \%.
+    The remaining metrics are unitless.}\label{tab:results}
+\end{table}
+
 \begin{enumerate}
-    \item{Table/figure of metrics}
-    \item{Plots:}
-        \begin{enumerate}
-            \item{parity}
-            \item{calibration}
-            \item{sharpness}
-        \end{enumerate}
     \item{Blocking results on best candidates (maybe put in SI)}
     \item{Cost of computing each method (if it’s there)}
     \item{Human overhead and difficulty}
