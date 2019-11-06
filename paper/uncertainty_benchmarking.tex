@@ -4,6 +4,9 @@
 \usepackage{commath}        % We have this here to use the \abs{} equation function
 \usepackage{graphicx}       % Display figures using \includegraphics
 \graphicspath{{figures/}}   % Location for figures relative to .tex file path
+\usepackage{booktabs}       % Use table things like \toprule or \bottomrule
+\usepackage[table]{xcolor}  % Lets us use \rowcolors to make alternate table shading
+\usepackage{makecell}       % Allow the use of the \makecell command that lets linebreaks in table cells
 \usepackage{etoolbox}       % Make the bibliograph unjustified (to work around hbox errors)
 \apptocmd{\thebibliography}{\raggedright}{}{}
 \usepackage{glossaries}     % Enable the \newacronym and \gls commands to reference terms
@@ -26,11 +29,7 @@
 \newacronym{BNN}{BNN}{Bayesian Neural Network}
 \newacronym{MLE}{MLE}{Maximum Likelihood Estimation}
 \newacronym{PFGP}{PFGP}{Penultimate-Fed Gaussian Process}
-
-%\usepackage{booktabs}       % Use table things like \toprule or \bottomrule
-%\usepackage[table]{xcolor}  % Lets us use \rowcolors to make alternate table shading
-%\usepackage{makecell}       % Allow the use of the \makecell command that lets linebreaks in table cells
-%\usepackage{pdflscape}      % Enable the \begin{landscape} command
+\newacronym{ML}{ML}{Machine Learning}
 
 
 %%%%%%%%%%%%%%%%%%%% Title/Abstract %%%%%%%%%%%%%%%%%%%%
@@ -54,13 +53,7 @@
 %\setlength{\fboxrule}{0 pt}
 %\begin{tocentry}
 %    \includegraphics[width=\textwidth]{TOC/TOC.pdf}
-%    This perspective discusses three common tools used in informatics research:
-%    databases, surrogate modeling, and workflow managers. Although these tools are not
-%    new, they are relatively new in the field of surface science and catalysis. We
-%    discuss how these tools can augment and accelerate surface science research, and we
-%    provide examples from both literature and our own work. We also provide our
-%    perspective on when to use these tools and some best practices to follow when
-%    creating them.
+%    TOC caption here.
 %\end{tocentry}
 
 \begin{abstract}
@@ -73,7 +66,7 @@
 \section{Introduction}
 
 The fields of catalysis and materials science are burgeoning with methods to screen, design, and understand materials.\cite{Medford2018, Gu2019, Schleder2019, Alberi2019}
-This research has spurned the creation of machine learning models to predict various material properties.
+This research has spurned the creation of \gls{ML} models to predict various material properties.
 Unfortunately, the design spaces for these models are sometimes too large and intractable to sample completely.
 These undersampling issues can limit the training data and therefore the predictive power of the models.
 It would be helpful to have an \gls{UQ} for a model so that we know when to trust the predictions and when not to.
@@ -92,6 +85,7 @@ Here we attempt to resolve this issue by benchmarking six different methods for 
 We acknowledge that there will not be one optimal method across all use cases, but we still find value in sharing these results so that others can build intuition from our results.
 Perhaps more importantly, we have also established a protocol for comparing the performance of different modeling and \gls{UQ} methods.
 
+% TODO:  Kevin to make this figure
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{placeholder.png}
@@ -129,7 +123,15 @@ Figure~\ref{fig:methods} illustrates all the methods we investigated in this stu
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{methods.pdf}
-    \caption{Overview of the various \gls{UQ} methods we investigated in this study.}\label{fig:methods}
+    \caption{Overview of the various \gls{UQ} methods we investigated in this study.
+        $\Delta E$ represents \gls{DFT}-calculated adsorption energies;
+        $\Delta \hat{E}$ represents \gls{ML}-predicted adsorption energies;
+        $UQ$ represents \gls{ML}-predicted uncertainty quantifications;
+        $\mu$ represents the mean of a sample of points;
+        $\sigma$ represents the standard deviation of a sample of points;
+        $\epsilon$ represents the residuals between \gls{DFT} and \gls{ML};
+        and $\hat{\epsilon}$ represents the residuals between \gls{ML}-predicted $\epsilon$ and the actual $\epsilon$.
+    }\label{fig:methods}
 \end{figure}
 
 \textbf{\gls{CGCNN}:}
