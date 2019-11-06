@@ -4,6 +4,7 @@
 \usepackage{commath}        % We have this here to use the \abs{} equation function
 \usepackage{graphicx}       % Display figures using \includegraphics
 \graphicspath{{figures/}}   % Location for figures relative to .tex file path
+\usepackage{subcaption}     % Enable the \subfigure command for multi-paneled figures
 \usepackage{booktabs}       % Use table things like \toprule or \bottomrule
 \usepackage[table]{xcolor}  % Lets us use \rowcolors to make alternate table shading
 \usepackage{makecell}       % Allow the use of the \makecell command that lets linebreaks in table cells
@@ -24,7 +25,7 @@
 \newacronym{MDAE}{MDAE}{Median Absolute Error}
 \newacronym{MARPD}{MARPD}{Mean Absolute Relative Percent Difference}
 \newacronym{R2}{R\textsuperscript{2}}{R\textsuperscript{2} correlation coefficient}
-\newacronym{Pearson}{PMCC}{Pearson product-moment correlation coefficent}
+\newacronym{Pearson}{PPMCC}{Pearson Product-Moment Correlation coefficent}
 \newacronym{NN}{NN}{crystal graph convolutional Neural Network}
 \newacronym{BNN}{BNN}{Bayesian Neural Network}
 \newacronym{MLE}{MLE}{Maximum Likelihood Estimation}
@@ -127,13 +128,13 @@ Figure~\ref{fig:methods} illustrates all the methods we investigated in this stu
     \centering
     \includegraphics[width=0.8\textwidth]{methods.pdf}
     \caption{Overview of the various \gls{UQ} methods we investigated in this study.
-        $\Delta E$ represents \gls{DFT}-calculated adsorption energies;
-        $\Delta \hat{E}$ represents \gls{ML}-predicted adsorption energies;
-        $UQ$ represents \gls{ML}-predicted uncertainty quantifications;
-        $\mu$ represents the mean of a sample of points;
-        $\sigma$ represents the standard deviation of a sample of points;
-        $\epsilon$ represents the residuals between \gls{DFT} and \gls{ML};
-        and $\hat{\epsilon}$ represents the residuals between \gls{ML}-predicted $\epsilon$ and the actual $\epsilon$.
+    $\Delta E$ represents \gls{DFT}-calculated adsorption energies;
+    $\Delta \hat{E}$ represents \gls{ML}-predicted adsorption energies;
+    $UQ$ represents \gls{ML}-predicted uncertainty quantifications;
+    $\mu$ represents the mean of a sample of points;
+    $\sigma$ represents the standard deviation of a sample of points;
+    $\epsilon$ represents the residuals between \gls{DFT} and \gls{ML};
+    and $\hat{\epsilon}$ represents the residuals between \gls{ML}-predicted $\epsilon$ and the actual $\epsilon$.
     }\label{fig:methods}
 \end{figure}
 
@@ -239,7 +240,7 @@ Table~\ref{tab:results} lists the performance metrics of all methods we used in 
         \toprule
         Method & \gls{MDAE} & \gls{MAE} & \gls{RMSE} & \gls{MARPD} & \gls{R2} & \gls{Pearson} & MisCal & Sha \\
         \midrule
-        \gls{NN} & 0.11 & 0.19 & 0.34 & 61 \% & 0.80 & 0.90 & N/A & N/A \\
+        \gls{NN} & 0.11 & 0.19 & 0.34 & 61 & 0.80 & 0.90 & N/A & N/A \\
         \gls{NN} ensemble & foo & foo & foo & foo & foo & foo & foo & foo \\
         \gls{BNN} & foo & foo & foo & foo & foo & foo & foo & foo \\
         \gls{dNN} & foo & foo & foo & foo & foo & foo & foo & foo \\
@@ -249,12 +250,45 @@ Table~\ref{tab:results} lists the performance metrics of all methods we used in 
         \bottomrule
     \end{tabular}
     \caption{Performance metrics for all methods used in this study, which include:
-        \glsentryfull{MDAE}, \glsentryfull{MAE}, \glsentryfull{RMSE}, \glsentryfull{MARPD},
-        \glsentryfull{R2}, \glsentryfull{Pearson},
-        miscalibration area (MisCal), and sharpness (Sha).
-        The units of \gls{MDAE}, \gls{MAE}, \gls{RMSE}, and Sha are all in \gls{eV}.
-        The units of \gls{MARPD} are in \%.}\label{tab:results}
+    \glsentryfull{MDAE}, \glsentryfull{MAE}, \glsentryfull{RMSE}, \glsentryfull{MARPD},
+    \glsentryfull{R2}, \glsentryfull{Pearson},
+    miscalibration area (MisCal), and sharpness (Sha).
+    The units of \gls{MDAE}, \gls{MAE}, \gls{RMSE}, and Sha are all in \gls{eV}.
+    The units of \gls{MARPD} are in \%.}\label{tab:results}
 \end{table}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/parity.pdf}
+        \caption{\gls{NN} ensemble}\label{fig:parity_nn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/parity.pdf}  % TODO:  Make and use the real parity plot here
+        \caption{\gls{BNN}}\label{fig:parity_bnn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/parity.pdf}  % TODO:  Make and use the real parity plot here
+        \caption{\gls{dNN}}\label{fig:parity_dnn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/parity.pdf}
+        \caption{\gls{GP}}\label{fig:parity_gp}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/parity.pdf}  % TODO:  Make and use the real parity plot here
+        \caption{\gls{dGP}}\label{fig:parity_dgp}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../PFGP/Matern/parity.pdf}
+        \caption{\gls{PFGP}}\label{fig:parity_pfgp}
+    \end{subfigure}
+    \caption{Parity plots for all six \gls{UQ} methods used in this study.
+    Shading plots were used in lieu of scatter plots because the large number of test points (8,289) obfuscated patterns.
+    Darker shading indicates a higher density of points.
+    Logarithm-scale shading was used to accentuate outliers.
+    The dashed, diagonal lines indicate parity.}\label{fig:parity}
+\end{figure}
 
 \begin{enumerate}
     \item{Plots:}
