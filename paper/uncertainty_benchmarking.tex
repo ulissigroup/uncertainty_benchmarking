@@ -158,13 +158,24 @@ These features are defined by the elements coordinated with the adsorbate and by
 Specifically:  We use the atomic numbers of these elements, their Pauling electronegativity, a count of the number of atoms of each element near the adsorbate, and the median adsorption energy between the adsorbate and the elements.
 To ensure that these features interacted well with the \gls{GP}'s kernel, we normalized each of the features to have a mean of zero and standard deviation of one.
 Reference \citet{Tran2018} for additional details.
-To define the GP, we assumed a constant mean and used a Matern covariance kernel.
+To define the \gls{GP}, we assumed a constant mean and used a Matern covariance kernel.
 We trained the length scale of the Matern kernel using the \gls{MLE} method with a Gaussian likelihood.
-All GP training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
+All \gls{GP} training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
 % TODO:  Willie double-check the wording here. I think we use a Gaussian likelihood, but does make it no longer MLE? You know best.
 
 \textbf{\gls{GP} with \gls{CGCNN}-predicted mean:}
-% TODO:  Willie
+\gls{GP}s are Bayesian models, in which a prior distribution is first
+specified, and then updated given observations, to yield a posterior
+distribution. The mean of this posterior distribution is used for regression,
+and the covariance matrix is used for \gls{UQ}. Typically, in lieu of any
+additional prior knowledge, practitioners will take the prior distribution to
+have zero-mean. However, we could instead supply an alternative curve for the
+prior mean, and then perform the usual Bayesian updates to compute the
+posterior of this \gls{GP} given observations. Here, for the GP prior mean, we
+supply the prediction given by a single pre-trained \gls{CGCNN}. For the
+\gls{GP}, we used a Matern covariance kernel, where we fit the kernel
+hyperparameters using \gls{MLE}.  All \gls{GP} training and predictions were
+done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
 
 \textbf{\gls{PFGP}:}
 A limitation of using this formulation of a \gls{GP} with \gls{CGCNN}-predicted mean is that it requires the use of hand-crafted features for the \gls{GP}.
@@ -176,7 +187,7 @@ In this case, we used the baseline \gls{CGCNN} as the network from which we obta
 We also normalized the penultimate outputs of the \gls{CGCNN} so that each output would have a mean of zero and a standard deviation of one.
 To define the \gls{GP}, we assumed a constant mean and used a Matern covariance kernel.
 We trained the length scale of the Matern kernel using the \gls{MLE} method with a Gaussian likelihood.
-All GP training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
+All \gls{GP} training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
 % TODO:  Willie double-check the wording here. I think we use a Gaussian likelihood, but does make it no longer MLE? You know best.
 
 
