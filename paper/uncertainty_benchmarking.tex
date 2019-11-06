@@ -18,7 +18,7 @@
 \newacronym{UQ}{UQ}{uncertainty quantification}
 \newacronym{MAE}{MAE}{Mean Absolute Error}
 \newacronym{RMSE}{RMSE}{Root Mean Squared Error}
-\newacronym{MDAE}{MDAE}{Median Absolute Deviation}
+\newacronym{MDAE}{MDAE}{Median Absolute Error}
 \newacronym{MARPD}{MARPD}{Mean Absolute Relative Percent Difference}
 \newacronym{R2}{R\textsuperscript{2}}{R\textsuperscript{2} correlation coefficient}
 \newacronym{Pearson}{Pearson's}{Pearson product-moment correlation coefficent}
@@ -124,7 +124,13 @@ After tuning, we calculated the training set results and present them in this pa
 \subsection{Regression methods}
 
 % TODO:  Willie to make intro to predictive uncertainty methods.
-% TODO:  We should have a diagram that outlines these method. Kevin can give it a shot.
+Figure~\ref{fig:methods} illustrates all the methods we investigated in this study.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{methods.pdf}
+    \caption{Overview of the various \gls{UQ} methods we investigated in this study.}\label{fig:methods}
+\end{figure}
 
 \textbf{\gls{CGCNN}:}
 To establish a baseline for predictive accuracy, we re-trained a previously reported \gls{CGCNN}\cite{Xie2018, Back2019} on this study's training set.
@@ -158,7 +164,7 @@ All GP training and predictions were done with GPU acceleration as implemented i
 \textbf{\gls{GP} with \gls{CGCNN}-predicted mean:}
 % TODO:  Willie
 
-\textbf{\gls{PFGP}}
+\textbf{\gls{PFGP}:}
 A limitation of using this formulation of a \gls{GP} with \gls{CGCNN}-predicted mean is that it requires the use of hand-crafted features for the \gls{GP}.
 This requirement reduces the transferability of the method to other applications where such features may not be readily available.
 To address this, we formulated a different method whereby we first train a neural network on the learning task (i.e., predict adsorption energies), and then we use the outputs of the penultimate layer of the network as features in a new \gls{GP}.
@@ -206,7 +212,7 @@ This idea of having small uncertainty estimates is called ``sharpness'', and \ci
 
 \noindent where $var(F_n)$ is the variance of the cumulative distribution function $F$ at point $n$.
 This is akin to the average variance of the uncertainty estimates on the test set.
-Here we propose a new formulation (Equation~\ref{eq:sharpness}) where we add a square root operation.
+Here we propose and use a new formulation (Equation~\ref{eq:sharpness}) where we add a square root operation.
 This operation gives the sharpness the same units as the predictions, which provides us with a more intuitive reference in the magnitude of the sharpness values.
 
 \begin{equation}\label{eq:sharpness}
