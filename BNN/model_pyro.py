@@ -3,7 +3,7 @@ from __future__ import print_function, division
 import torch
 
 import torch.nn as nn
-from cgcnn.data import collate_pool, MergeDataset
+from data_pyro import collate_pool, MergeDataset
 
 
 class ConvLayer(nn.Module):
