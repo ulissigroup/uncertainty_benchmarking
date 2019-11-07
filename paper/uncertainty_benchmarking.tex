@@ -78,7 +78,7 @@ More specifically:  \gls{UQ} would enable various online, active frameworks for 
 
 Such active frameworks have already been used successfully in the field of catalysis and materials informatics.
 For example:  \citet{Peterson2016} has used a neural network to perform online active learning of \gls{NEB} calculations, reducing the number of force calls by an order of magnitude.
-\citet{Torres2018} have used also used online active learning to accelerate \gls{NEB} calculations, but they used a \gls{GP} model instead of a neural network.
+\citet{Torres2018} have also used online active learning to accelerate \gls{NEB} calculations, but they used a \gls{GP} model instead of a neural network.
 \citet{Jinnouchi2019} have used online active learning to accelerate molecular dynamics simulations.
 Each of these active methods are underpinned by models with \gls{UQ}, which has garnered increasing attention itself.\cite{Peterson2017, Musil2019}
 
@@ -87,7 +87,7 @@ Each of these active methods are underpinned by models with \gls{UQ}, which has 
 To our knowledge though, we have not seen many comparisons of different methods for \gls{UQ} within the field of catalysis and materials informatics.
 Here we attempt to resolve this issue by benchmarking different methods for \gls{UQ} (Figure~\ref{fig:overview}).
 We acknowledge that there will not be one optimal method across all use cases, but we still find value in sharing these results so that others can build intuition from our results.
-Perhaps more importantly, we have also established a protocol for comparing the performance of different modeling and \gls{UQ} methods.
+Perhaps more importantly, we have also establish a protocol for comparing the performance of different modeling and \gls{UQ} methods.
 
 % TODO:  Kevin to make this figure
 \begin{figure}
@@ -118,6 +118,8 @@ We did this because some of the regression methods in this paper use a featuriza
 After this allocation, we performed a 64/14/20 train/validate/test split that was stratified\cite{Thompson2012} by adsorbate.
 We then used the validation set's results to tune various hyperparameters manually.
 After tuning, we calculated the training set results and present them in this paper exclusively.
+Note that the test results were obtained using models that were trained only using the training set, not the validation set.
+This is acceptable because we only seek to compare methods here, not to optimize them.
 
 \subsection{Regression methods}
 
@@ -192,7 +194,6 @@ We trained the length scale of the Matern kernel using the \gls{MLE} method with
 All \gls{GP} training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
 % TODO:  Willie double-check the wording here. I think we use a Gaussian likelihood, but does make it no longer MLE? You know best.
 
-
 \subsection{Performance metrics}
 
 We used six different metrics to quantify the accuracy of the various models:  \gls{MDAE}, \gls{RMSE}, \gls{MAE}, \gls{MARPD}, \gls{R2}, and \gls{Pearson}.
@@ -238,14 +239,92 @@ In other words:  Sharpness is akin to the average of the \gls{ML}-predicted stan
 
 \section{Results}
 
-Figure~\ref{fig:parity} contains parity plots for all \gls{UQ} methods studied here; Figure~\ref{fig:calibration} contains calibration curves; and Figure~\ref{fig:sharpness} contains distribution plots of the \gls{ML}-predicted \gls{UQ}s.
+\subsection{Illustrative examples}
+
+Let us first discuss the results of our \gls{NN} ensemble for illustrative purposes.
+Figure~\ref{fig:results_example} contains a parity plot, calibration curve, and predicted-uncertainty distribution of our \gls{NN} ensemble model.
+The parity plot shows the accuracy of the model; the calibration curve shows the honesty of the model's uncertainty predictions; and the uncertainty distribution shows the sharpness of model's uncertainty predictions.
+Accurate models have parity plots whose points tend to fall near the diagonal parity line.
+Sharp models have uncertainty distributions that tend towards zero.
+Note that sharpness should not be won at the cost of calibration.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/parity.pdf}
+        \caption{parity plot}\label{fig:parity_example}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/calibration.pdf}
+        \caption{calibration curve}\label{fig:calibration_example}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/sharpness.pdf}
+        \caption{uncertainty distribution}\label{fig:sharpness_example}
+    \end{subfigure}
+    \caption{Results of the \gls{NN} ensemble. Each figure here was created with the test set of 8,289 points.}\label{fig:results_example}
+\end{figure}
+
+The calibration curve was created by first normalizing all test residuals by their respective uncertainty values, i.e.\ we divided the residuals by their predicted standard deviations.
+If we assume that the normalized residuals follow a Gaussian distribution, then 68\% of the normalized residuals would fall between [-1, 1], 95\% of them would fall between [-2, 2], 99\% of them would fall between [-3, 3], etc.
+To challenge this assumption, we plotted the actual fraction of points within each prediction interval against the expected fraction of points.
+This plot is a calibration curve.
+Thus a perfectly calibrated model would have normalized residuals that are perfectly Gaussian, which would yield a diagonal calibration line.
+Therefore, models' calibration could be qualified by the closeness of their calibration curves to this ideal, diagonal curve.
+We quantified this closeness by calculating the area between the calibration curve and the ideal diagonal.
+We call this the miscalibration area, and smaller values indicate better calibration.
+
+The shape of a calibration curve could also yield other insights.
+If a model's \gls{UQ}s were too low/confident, then the normalized residuals would be too large and they would fall outside their expected prediction intervals too frequently.
+This would result in observed prediction intervals that are lower than expected, which would correspond to a calibration curve that falls below the ideal diagonal.
+Therefore, overconfident models yield calibration curves that fall under the ideal diagonal, and underconfident models yield calibration curves that fall over the ideal diagonal.
+Figure~\ref{fig:error_bars} illustrates this point by plotting calibration curves of various models alongside their parity plots that contain error bars corresponding to $\pm$2 standard deviations.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/calibration.pdf}
+        \caption{calibration of \gls{NN} ensemble}\label{fig:calibration_example_ensemble}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/calibration.pdf}
+        \caption{calibration of \gls{GP}}\label{fig:calibration_example_gp}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../PFGP/Matern/calibration.pdf}
+        \caption{calibration of \gls{PFGP}}\label{fig:calibration_example_pfgp}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../CGCNN_ensemble/error_bar_parity.pdf}
+        \caption{parity of \gls{NN} ensemble}\label{fig:error_bar_ensemble}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../GP/Matern/error_bar_parity.pdf}
+        \caption{parity of \gls{GP}}\label{fig:error_bar_gp}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../PFGP/Matern/error_bar_parity.pdf}
+        \caption{parity of \gls{PFGP}}\label{fig:error_bar_pfgp}
+    \end{subfigure}
+    \caption{Calibration curves and parity plots of an overconfident \gls{NN} ensemble, an underconfident \gls{GP}, and better-calibrated \gls{PFGP}.
+    The vertical uncertainty bands in the parity plots indicate $\pm$2 standard deviations in the uncertainty predictions of each model.
+    For clarity, we sampled only 20 points of the 8,289 test points to put in the parity plots.
+    It follows that relatively overconfident models would have more points with uncertainty bands that do not cross the diagonal parity line;
+    relatively underconfident models would have more points that cross the diagonal parity line;
+    and a well-calibrated model would have 19 out of 20 points cross the parity line.}\label{fig:error_bars}
+\end{figure}
+
+\subsection{Summary results}
+
+Figure~\ref{fig:parity} contains parity plots for all \gls{UQ} methods studied here; Figure~\ref{fig:calibration} contains all calibration curves; and Figure~\ref{fig:sharpness} contains all distribution plots of the \gls{ML}-predicted \gls{UQ}s.
 These figures illustrate the accuracy, calibration, and sharpness of the different \gls{UQ} methods, respectively.
+Table~\ref{tab:results} lists their performance metrics.
 
 \begin{figure}
     \centering
     \begin{subfigure}{0.32\textwidth}
         \includegraphics[width=\textwidth]{../CGCNN_ensemble/parity.pdf}
-        \caption{\gls{NN} ensemble}\label{fig:parity_nn}
+        \caption{\gls{NN} ensemble}\label{fig:parity_ensemble}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
         \includegraphics[width=\textwidth]{../BNN/parity.pdf}
@@ -278,7 +357,7 @@ These figures illustrate the accuracy, calibration, and sharpness of the differe
     \centering
     \begin{subfigure}{0.32\textwidth}
         \includegraphics[width=\textwidth]{../CGCNN_ensemble/calibration.pdf}
-        \caption{\gls{NN} ensemble}\label{fig:calibration_nn}
+        \caption{\gls{NN} ensemble}\label{fig:calibration_ensemble}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
         \includegraphics[width=\textwidth]{../BNN/calibration.pdf}
@@ -310,7 +389,7 @@ These figures illustrate the accuracy, calibration, and sharpness of the differe
     \centering
     \begin{subfigure}{0.32\textwidth}
         \includegraphics[width=\textwidth]{../CGCNN_ensemble/sharpness.pdf}
-        \caption{\gls{NN} ensemble}\label{fig:sharpness_nn}
+        \caption{\gls{NN} ensemble}\label{fig:sharpness_ensemble}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
         \includegraphics[width=\textwidth]{../BNN/sharpness.pdf}
@@ -336,8 +415,6 @@ These figures illustrate the accuracy, calibration, and sharpness of the differe
     Sharpness values are indicated by vertical lines.}\label{fig:sharpness}
 \end{figure}
 
-Table~\ref{tab:results} summarizes all performance metrics.
-
 \begin{table}
     \centering
     \begin{tabular}{lrrrrrrrr}
@@ -361,6 +438,10 @@ Table~\ref{tab:results} summarizes all performance metrics.
     The units of \gls{MARPD} are in \%.
     The remaining metrics are unitless.}\label{tab:results}
 \end{table}
+
+All methods' \gls{MDAE} results are identical, and their \gls{MAE} results are within 10\% of each other.
+This suggests that all methods have comparable predictive accuracies for inliers.
+The plain \gls{GP} has a higher \gls{RMSE} value than the rest of the methods though, suggesting that \gls{GP}s may be less accurate for outliers than \gls{NN}-based methods.
 
 \begin{enumerate}
     \item{Blocking results on best candidates (maybe put in SI)}
