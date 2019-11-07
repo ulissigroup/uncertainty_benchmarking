@@ -248,7 +248,7 @@ These figures illustrate the accuracy, calibration, and sharpness of the differe
         \caption{\gls{NN} ensemble}\label{fig:parity_nn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/parity.pdf}  % TODO:  Make and use the real parity plot here
+        \includegraphics[width=\textwidth]{../BNN/parity.pdf}
         \caption{\gls{BNN}}\label{fig:parity_bnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -270,7 +270,7 @@ These figures illustrate the accuracy, calibration, and sharpness of the differe
     \caption{Parity plots for all \gls{UQ} methods used in this study.
     Shading plots were used in lieu of scatter plots because the large number of test points (8,289) obfuscated patterns.
     Darker shading indicates a higher density of points.
-    Logarithm-scale shading was used to accentuate outliers.
+    Logarithmically scaled shading was used to accentuate outliers.
     The dashed, diagonal lines indicate parity.}\label{fig:parity}
 \end{figure}
 
@@ -281,7 +281,7 @@ These figures illustrate the accuracy, calibration, and sharpness of the differe
         \caption{\gls{NN} ensemble}\label{fig:calibration_nn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/calibration.pdf}  % TODO:  Make and use the real calibration plot here
+        \includegraphics[width=\textwidth]{../BNN/calibration.pdf}
         \caption{\gls{BNN}}\label{fig:calibration_bnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -313,7 +313,7 @@ These figures illustrate the accuracy, calibration, and sharpness of the differe
         \caption{\gls{NN} ensemble}\label{fig:sharpness_nn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/sharpness.pdf}  % TODO:  Make and use the real sharpness plot here
+        \includegraphics[width=\textwidth]{../BNN/sharpness.pdf}
         \caption{\gls{BNN}}\label{fig:sharpness_bnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -342,15 +342,15 @@ Table~\ref{tab:results} summarizes all performance metrics.
     \centering
     \begin{tabular}{lrrrrrrrr}
         \toprule
-        Method & \gls{MDAE} & \gls{MAE} & \gls{RMSE} & \gls{MARPD} & \gls{R2} & \gls{Pearson} & MisCal & Sha \\
+        Method              & \gls{MDAE}    & \gls{MAE} & \gls{RMSE}    & \gls{MARPD}   & \gls{R2}  & \gls{Pearson} & MisCal    & Sha \\
         \midrule
-        \gls{NN} & 0.11 & 0.19 & 0.34 & 61 & 0.80 & 0.90 & N/A & N/A \\
-        \gls{NN} ensemble & foo & foo & foo & foo & foo & foo & foo & foo \\
-        \gls{BNN} & foo & foo & foo & foo & foo & foo & foo & foo \\
-        \gls{dNN} & foo & foo & foo & foo & foo & foo & foo & foo \\
-        \gls{GP} & foo & foo & foo & foo & foo & foo & foo & foo \\
-        \gls{dGP} & foo & foo & foo & foo & foo & foo & foo & foo \\
-        \gls{PFGP} & foo & foo & foo & foo & foo & foo & foo & foo \\
+        \gls{NN}            & 0.11          & 0.19      & 0.34          & 61            & 0.80      & 0.90          & N/A       & N/A \\
+        \gls{NN} ensemble   & 0.11          & 0.18      & 0.31          & 59            & 0.82      & 0.90          & 0.23      & 0.14 \\
+        \gls{BNN}           & 0.11          & 0.19      & 0.31          & 59            & 0.83      & 0.91          & 0.38      & 0.03 \\
+        \gls{dNN}           & foo           & foo       & foo           & foo           & foo       & foo           & foo       & foo \\
+        \gls{GP}            & 0.11          & 0.21      & 0.39          & 61            & 0.73      & 0.85          & 0.27      & 0.65 \\
+        \gls{dGP}           & 0.11          & 0.19      & 0.33          & 59            & 0.81      & 0.90          & 0.02      & 0.21 \\
+        \gls{PFGP}          & 0.11          & 0.20      & 0.34          & 61            & 0.80      & 0.89          & 0.04      & 0.38 \\
         \bottomrule
     \end{tabular}
     \caption{Performance metrics for all methods used in this study, which include:
@@ -380,6 +380,8 @@ Table~\ref{tab:results} summarizes all performance metrics.
 
 \section*{Code availability} Visit \texttt{https://github.com/ulissigroup/uncertainty\_benchmarking} for the code used to create the results discussed in this paper.
 The code dependencies are listed inside the repository.
+Due to GitHub's constraints on file sizes, the raw data cache used in this work (\texttt{splits\_gasdb.pkl}) could not be put into the repository directly.
+This file is available upon request.
 
 \section*{Author information} Corresponding author email:  zulissi@andrew.cmu.edu.
 The authors declare no competing financial interest.
