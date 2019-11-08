@@ -152,8 +152,8 @@ Thus the mean of each of these models' predictions is the final prediction of th
 % TODO:  Willie to provide justification for subsampling method. And maybe a reference for K-folding?
 
 \textbf{\glsentrytext{BNN}:}
-Something about \gls{BNN}.
-% TODO:  Jun
+The aim of Bayesian Neural Network (\gls{BNN}) is to determine the posterior distribution of model parameters rather than a single optimal value of the parameters. In practice, inferring true posterior is very difficult and even infeasible in most cases. Thus, we approximate the model posterior to be as close as possible to the true posterior by doing variational inference. This could be done by training \gls{BNN} to minimize the Kullback-Leibler (KL) divergence between the variational distribution and the true posterior. We sample the model parameters K times from the approximated posterior, and use the mean of these models’ predictions as the final prediction and the standard deviation of those predictions as the estimation of uncertainty. We implemented \gls{BNN} and performed variational inference using Pyro.\cite{Pyro2018}
+
 
 \textbf{\glsentrytext{dNN}:}
 Something about \gls{dNN}
