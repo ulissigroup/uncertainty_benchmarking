@@ -155,9 +155,9 @@ Thus the mean of each of these models' predictions is the final prediction of th
 The aim of \gls{BNN} is to determine the posterior distribution of model parameters rather than a single optimal value of the parameters.
 In practice, inferring true posterior is very difficult and even infeasible in most cases.
 Thus, we approximate the model posterior to be as close as possible to the true posterior by doing variational inference.
-This could be done by training \gls{BNN} to minimize the Kullback-Leibler divergence between the variational distribution and the true posterior.
-We sample the model parameters K times from the approximated posterior, and use the mean of these models’ predictions as the final prediction and the standard deviation of those predictions as the estimation of uncertainty.
-We implemented \gls{BNN} and performed variational inference using Pyro.\cite{Bingham2018}
+This could be done by training the \gls{BNN} to minimize the Kullback-Leibler divergence between the variational distribution and the true posterior.
+We sampled the model parameters K times from the approximated posterior, and used the mean of these predictions as the final prediction and the standard deviation of these predictions as the estimation of uncertainty.
+We implemented the \gls{BNN} and performed variational inference using Pyro.\cite{Bingham2018}
 
 \textbf{\glsentrytext{dNN}:}
 Something about \gls{dNN}
@@ -458,7 +458,13 @@ The plain \gls{GP} has a higher \gls{RMSE} value than the rest of the methods th
 
 \section{Conclusions}
 
-% TODO:  Kevin Observations about relative accuracies, calibrations, sharpnesses, overhead. Note that we did not do any calibration, and possibly provide references on how to do that if you wanted to.
+\begin{enumerate}
+    \item{Relative accuracies}
+    \item{Relative calibrations}
+    \item{Relative sharpnesses}
+    \item{Overhead}
+    \item{Calibration}
+\end{enumerate}
 
 
 %%%%%%%%%%%%%%%%%%%% Misc %%%%%%%%%%%%%%%%%%%%
