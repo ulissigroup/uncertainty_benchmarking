@@ -280,7 +280,7 @@ We call this the miscalibration area, and smaller values indicate better calibra
 
 The shape of a calibration curve could also yield other insights.
 If a model's \gls{UQ}s were too low/confident, then the normalized residuals would be too large and they would fall outside their expected prediction intervals too frequently.
-This would result in observed prediction intervals that are lower than expected, which would correspond to a calibration curve that falls below the ideal diagonal.
+This would result in a lower fraction of points observed within the expected prediction intervals, which would correspond to a calibration curve that falls below the ideal diagonal.
 Therefore, overconfident models yield calibration curves that fall under the ideal diagonal, and underconfident models yield calibration curves that fall over the ideal diagonal.
 Figure~\ref{fig:error_bars} illustrates this point by plotting calibration curves of various models alongside their parity plots that contain error bars corresponding to $\pm$2 standard deviations.
 
@@ -295,8 +295,8 @@ Figure~\ref{fig:error_bars} illustrates this point by plotting calibration curve
         \caption{calibration of \gls{GP}}\label{fig:calibration_example_gp}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../PFGP/Matern/calibration.pdf}
-        \caption{calibration of \gls{PFGP}}\label{fig:calibration_example_pfgp}
+        \includegraphics[width=\textwidth]{../NNdGP/Matern/calibration.pdf}
+        \caption{calibration of \gls{dGP}}\label{fig:calibration_example_pfgp}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
         \includegraphics[width=\textwidth]{../NN_ensemble/error_bar_parity.pdf}
@@ -307,15 +307,15 @@ Figure~\ref{fig:error_bars} illustrates this point by plotting calibration curve
         \caption{parity of \gls{GP}}\label{fig:error_bar_gp}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../PFGP/Matern/error_bar_parity.pdf}
-        \caption{parity of \gls{PFGP}}\label{fig:error_bar_pfgp}
+        \includegraphics[width=\textwidth]{../NNdGP/Matern/error_bar_parity.pdf}
+        \caption{parity of \gls{dGP}}\label{fig:error_bar_pfgp}
     \end{subfigure}
-    \caption{Calibration curves and parity plots of an overconfident \gls{NN} ensemble, an underconfident \gls{GP}, and better-calibrated \gls{PFGP}.
+    \caption{Calibration curves and parity plots of an overconfident \gls{NN} ensemble, an underconfident \gls{GP}, and better-calibrated \gls{dGP}.
     The vertical uncertainty bands in the parity plots indicate $\pm$2 standard deviations in the uncertainty predictions of each model.
     For clarity, we sampled only 20 points of the 8,289 test points to put in the parity plots.
     It follows that relatively overconfident models would have more points with uncertainty bands that do not cross the diagonal parity line;
     relatively underconfident models would have more points that cross the diagonal parity line;
-    and a well-calibrated model would have 19 out of 20 points cross the parity line.}\label{fig:error_bars}
+    and a well-calibrated model would have \textit{ca.} 19 out of 20 points cross the parity line.}\label{fig:error_bars}
 \end{figure}
 
 \subsection{Summary results}
