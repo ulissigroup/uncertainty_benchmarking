@@ -255,15 +255,15 @@ Note that sharpness should not be won at the cost of calibration.
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/parity.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/parity.pdf}
         \caption{parity plot}\label{fig:parity_example}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/calibration.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/calibration.pdf}
         \caption{calibration curve}\label{fig:calibration_example}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/sharpness.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/sharpness.pdf}
         \caption{uncertainty distribution}\label{fig:sharpness_example}
     \end{subfigure}
     \caption{Results of the \gls{NN} ensemble. Each figure here was created with the test set of 8,289 points.}\label{fig:results_example}
@@ -287,7 +287,7 @@ Figure~\ref{fig:error_bars} illustrates this point by plotting calibration curve
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/calibration.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/calibration.pdf}
         \caption{calibration of \gls{NN} ensemble}\label{fig:calibration_example_ensemble}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
@@ -299,7 +299,7 @@ Figure~\ref{fig:error_bars} illustrates this point by plotting calibration curve
         \caption{calibration of \gls{PFGP}}\label{fig:calibration_example_pfgp}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/error_bar_parity.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/error_bar_parity.pdf}
         \caption{parity of \gls{NN} ensemble}\label{fig:error_bar_ensemble}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
@@ -327,7 +327,7 @@ Table~\ref{tab:results} lists their performance metrics.
 \begin{figure}
     \centering
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/parity.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/parity.pdf}
         \caption{\gls{NN} ensemble}\label{fig:parity_ensemble}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -360,7 +360,7 @@ Table~\ref{tab:results} lists their performance metrics.
 \begin{figure}
     \centering
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/calibration.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/calibration.pdf}
         \caption{\gls{NN} ensemble}\label{fig:calibration_ensemble}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -392,7 +392,7 @@ Table~\ref{tab:results} lists their performance metrics.
 \begin{figure}
     \centering
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/sharpness.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/sharpness.pdf}
         \caption{\gls{NN} ensemble}\label{fig:sharpness_ensemble}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -426,12 +426,12 @@ Table~\ref{tab:results} lists their performance metrics.
         Method              & \gls{MDAE}    & \gls{MAE} & \gls{RMSE}    & \gls{MARPD}   & \gls{R2}  & \gls{Pearson} & MisCal    & Sha \\
         \midrule
         \gls{NN}            & 0.11          & 0.19      & 0.34          & 61            & 0.80      & 0.90          & N/A       & N/A \\
-        \gls{NN} ensemble   & 0.11          & 0.18      & 0.31          & 59            & 0.82      & 0.90          & 0.23      & 0.14 \\
-        \gls{BNN}           & 0.11          & 0.19      & 0.31          & 59            & 0.83      & 0.91          & 0.38      & 0.03 \\
-        \gls{dNN}           & foo           & foo       & foo           & foo           & foo       & foo           & foo       & foo \\
-        \gls{GP}            & 0.11          & 0.21      & 0.39          & 61            & 0.73      & 0.85          & 0.27      & 0.65 \\
-        \gls{dGP}           & 0.11          & 0.19      & 0.33          & 59            & 0.81      & 0.90          & 0.02      & 0.21 \\
-        \gls{PFGP}          & 0.11          & 0.20      & 0.34          & 61            & 0.80      & 0.89          & 0.04      & 0.38 \\
+        \gls{NN} ensemble   & 0.11          & 0.18      & 0.32          & 59            & 0.82      & 0.90          & 0.23      & 0.14 \\
+        \gls{BNN}           & 0.11          & 0.19      & 0.31          & 59            & 0.83      & 0.91          & 0.41      & 0.03 \\
+        \gls{dNN}           & 0.11          & 0.19      & 0.34          & 59            & 0.80      & 0.89          & 0.10      & 0.16 \\
+        \gls{GP}            & 0.11          & 0.21      & 0.39          & 61            & 0.73      & 0.85          & 0.28      & 0.65 \\
+        \gls{dGP}           & 0.11          & 0.19      & 0.33          & 59            & 0.81      & 0.90          & 0.05      & 0.21 \\
+        \gls{PFGP}          & 0.11          & 0.20      & 0.34          & 61            & 0.80      & 0.89          & 0.07      & 0.38 \\
         \bottomrule
     \end{tabular}
     \caption{Performance metrics for all methods used in this study, which include:
