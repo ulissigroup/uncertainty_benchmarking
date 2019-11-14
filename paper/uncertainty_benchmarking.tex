@@ -152,8 +152,12 @@ Thus the mean of each of these models' predictions is the final prediction of th
 % TODO:  Willie to provide justification for subsampling method. And maybe a reference for K-folding?
 
 \textbf{\glsentrytext{BNN}:}
-Something about \gls{BNN}.
-% TODO:  Jun
+The aim of \gls{BNN} is to determine the posterior distribution of model parameters rather than a single optimal value of the parameters.
+In practice, inferring true posterior is very difficult and even infeasible in most cases.
+Thus, we approximate the model posterior to be as close as possible to the true posterior by doing variational inference.
+This could be done by training \gls{BNN} to minimize the Kullback-Leibler divergence between the variational distribution and the true posterior.
+We sample the model parameters K times from the approximated posterior, and use the mean of these models’ predictions as the final prediction and the standard deviation of those predictions as the estimation of uncertainty.
+We implemented \gls{BNN} and performed variational inference using Pyro.\cite{Bingham2018}
 
 \textbf{\glsentrytext{dNN}:}
 Something about \gls{dNN}
@@ -331,7 +335,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{BNN}}\label{fig:parity_bnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../GP/Matern/parity.pdf}  % TODO:  Make and use the real parity plot here
+        \includegraphics[width=\textwidth]{../NNdNN/parity.pdf}
         \caption{\gls{dNN}}\label{fig:parity_dnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -339,7 +343,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{GP}}\label{fig:parity_gp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../GP_with_CGCNN_mean/Matern/parity.pdf}  % TODO: Update this path after we update directory name
+        \includegraphics[width=\textwidth]{../NNdGP/Matern/parity.pdf}
         \caption{\gls{dGP}}\label{fig:parity_dgp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -364,7 +368,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{BNN}}\label{fig:calibration_bnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../GP/Matern/calibration.pdf}  % TODO:  Make and use the real calibration plot here
+        \includegraphics[width=\textwidth]{../NNdNN/calibration.pdf}
         \caption{\gls{dNN}}\label{fig:calibration_dnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -372,7 +376,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{GP}}\label{fig:calibration_gp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../GP_with_CGCNN_mean/Matern/calibration.pdf}  % TODO: Update this path after we update directory name
+        \includegraphics[width=\textwidth]{../NNdGP/Matern/calibration.pdf}
         \caption{\gls{dGP}}\label{fig:calibration_dgp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -396,7 +400,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{BNN}}\label{fig:sharpness_bnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../GP/Matern/sharpness.pdf}  % TODO:  Make and use the real sharpness plot here
+        \includegraphics[width=\textwidth]{../NNdNN/sharpness.pdf}
         \caption{\gls{dNN}}\label{fig:sharpness_dnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -404,7 +408,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{GP}}\label{fig:sharpness_gp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../GP_with_CGCNN_mean/Matern/sharpness.pdf}  % TODO:  Update this path after we update directory name
+        \includegraphics[width=\textwidth]{../NNdGP/Matern/sharpness.pdf}
         \caption{\gls{dGP}}\label{fig:sharpness_dgp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -439,7 +443,7 @@ Table~\ref{tab:results} lists their performance metrics.
     The remaining metrics are unitless.}\label{tab:results}
 \end{table}
 
-All methods' \gls{MDAE} results are identical, and their \gls{MAE} results are within 10\% of each other.
+All methods' \gls{MDAE} results are virtually identical, and their \gls{MAE} results are within 10\% of each other.
 This suggests that all methods have comparable predictive accuracies for inliers.
 The plain \gls{GP} has a higher \gls{RMSE} value than the rest of the methods though, suggesting that \gls{GP}s may be less accurate for outliers than \gls{NN}-based methods.
 
