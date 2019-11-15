@@ -152,8 +152,12 @@ Thus the mean of each of these models' predictions is the final prediction of th
 % TODO:  Willie to provide justification for subsampling method. And maybe a reference for K-folding?
 
 \textbf{\glsentrytext{BNN}:}
-The aim of Bayesian Neural Network (\gls{BNN}) is to determine the posterior distribution of model parameters rather than a single optimal value of the parameters. In practice, inferring true posterior is very difficult and even infeasible in most cases. Thus, we approximate the model posterior to be as close as possible to the true posterior by doing variational inference. This could be done by training \gls{BNN} to minimize the Kullback-Leibler (KL) divergence between the variational distribution and the true posterior. We sample the model parameters K times from the approximated posterior, and use the mean of these models’ predictions as the final prediction and the standard deviation of those predictions as the estimation of uncertainty. We implemented \gls{BNN} and performed variational inference using Pyro.\cite{Pyro2018}
-
+The aim of \gls{BNN} is to determine the posterior distribution of model parameters rather than a single optimal value of the parameters.
+In practice, inferring true posterior is very difficult and even infeasible in most cases.
+Thus, we approximate the model posterior to be as close as possible to the true posterior by doing variational inference.
+This could be done by training the \gls{BNN} to minimize the Kullback-Leibler divergence between the variational distribution and the true posterior.
+We sampled the model parameters K times from the approximated posterior, and used the mean of these predictions as the final prediction and the standard deviation of these predictions as the estimation of uncertainty.
+We implemented the \gls{BNN} and performed variational inference using Pyro.\cite{Bingham2018}
 
 \textbf{\glsentrytext{dNN}:}
 Something about \gls{dNN}
@@ -251,15 +255,15 @@ Note that sharpness should not be won at the cost of calibration.
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/parity.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/parity.pdf}
         \caption{parity plot}\label{fig:parity_example}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/calibration.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/calibration.pdf}
         \caption{calibration curve}\label{fig:calibration_example}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/sharpness.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/sharpness.pdf}
         \caption{uncertainty distribution}\label{fig:sharpness_example}
     \end{subfigure}
     \caption{Results of the \gls{NN} ensemble. Each figure here was created with the test set of 8,289 points.}\label{fig:results_example}
@@ -276,14 +280,14 @@ We call this the miscalibration area, and smaller values indicate better calibra
 
 The shape of a calibration curve could also yield other insights.
 If a model's \gls{UQ}s were too low/confident, then the normalized residuals would be too large and they would fall outside their expected prediction intervals too frequently.
-This would result in observed prediction intervals that are lower than expected, which would correspond to a calibration curve that falls below the ideal diagonal.
+This would result in a lower fraction of points observed within the expected prediction intervals, which would correspond to a calibration curve that falls below the ideal diagonal.
 Therefore, overconfident models yield calibration curves that fall under the ideal diagonal, and underconfident models yield calibration curves that fall over the ideal diagonal.
 Figure~\ref{fig:error_bars} illustrates this point by plotting calibration curves of various models alongside their parity plots that contain error bars corresponding to $\pm$2 standard deviations.
 
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/calibration.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/calibration.pdf}
         \caption{calibration of \gls{NN} ensemble}\label{fig:calibration_example_ensemble}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
@@ -291,11 +295,11 @@ Figure~\ref{fig:error_bars} illustrates this point by plotting calibration curve
         \caption{calibration of \gls{GP}}\label{fig:calibration_example_gp}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../PFGP/Matern/calibration.pdf}
-        \caption{calibration of \gls{PFGP}}\label{fig:calibration_example_pfgp}
+        \includegraphics[width=\textwidth]{../NNdGP/Matern/calibration.pdf}
+        \caption{calibration of \gls{dGP}}\label{fig:calibration_example_pfgp}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/error_bar_parity.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/error_bar_parity.pdf}
         \caption{parity of \gls{NN} ensemble}\label{fig:error_bar_ensemble}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
@@ -303,15 +307,15 @@ Figure~\ref{fig:error_bars} illustrates this point by plotting calibration curve
         \caption{parity of \gls{GP}}\label{fig:error_bar_gp}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../PFGP/Matern/error_bar_parity.pdf}
-        \caption{parity of \gls{PFGP}}\label{fig:error_bar_pfgp}
+        \includegraphics[width=\textwidth]{../NNdGP/Matern/error_bar_parity.pdf}
+        \caption{parity of \gls{dGP}}\label{fig:error_bar_pfgp}
     \end{subfigure}
-    \caption{Calibration curves and parity plots of an overconfident \gls{NN} ensemble, an underconfident \gls{GP}, and better-calibrated \gls{PFGP}.
+    \caption{Calibration curves and parity plots of an overconfident \gls{NN} ensemble, an underconfident \gls{GP}, and better-calibrated \gls{dGP}.
     The vertical uncertainty bands in the parity plots indicate $\pm$2 standard deviations in the uncertainty predictions of each model.
     For clarity, we sampled only 20 points of the 8,289 test points to put in the parity plots.
     It follows that relatively overconfident models would have more points with uncertainty bands that do not cross the diagonal parity line;
     relatively underconfident models would have more points that cross the diagonal parity line;
-    and a well-calibrated model would have 19 out of 20 points cross the parity line.}\label{fig:error_bars}
+    and a well-calibrated model would have \textit{ca.} 19 out of 20 points cross the parity line.}\label{fig:error_bars}
 \end{figure}
 
 \subsection{Summary results}
@@ -323,7 +327,7 @@ Table~\ref{tab:results} lists their performance metrics.
 \begin{figure}
     \centering
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/parity.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/parity.pdf}
         \caption{\gls{NN} ensemble}\label{fig:parity_ensemble}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -331,7 +335,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{BNN}}\label{fig:parity_bnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../GP/Matern/parity.pdf}  % TODO:  Make and use the real parity plot here
+        \includegraphics[width=\textwidth]{../NNdNN/parity.pdf}
         \caption{\gls{dNN}}\label{fig:parity_dnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -339,7 +343,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{GP}}\label{fig:parity_gp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../GP_with_CGCNN_mean/Matern/parity.pdf}  % TODO: Update this path after we update directory name
+        \includegraphics[width=\textwidth]{../NNdGP/Matern/parity.pdf}
         \caption{\gls{dGP}}\label{fig:parity_dgp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -356,7 +360,7 @@ Table~\ref{tab:results} lists their performance metrics.
 \begin{figure}
     \centering
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/calibration.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/calibration.pdf}
         \caption{\gls{NN} ensemble}\label{fig:calibration_ensemble}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -364,7 +368,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{BNN}}\label{fig:calibration_bnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../GP/Matern/calibration.pdf}  % TODO:  Make and use the real calibration plot here
+        \includegraphics[width=\textwidth]{../NNdNN/calibration.pdf}
         \caption{\gls{dNN}}\label{fig:calibration_dnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -372,7 +376,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{GP}}\label{fig:calibration_gp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../GP_with_CGCNN_mean/Matern/calibration.pdf}  % TODO: Update this path after we update directory name
+        \includegraphics[width=\textwidth]{../NNdGP/Matern/calibration.pdf}
         \caption{\gls{dGP}}\label{fig:calibration_dgp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -388,7 +392,7 @@ Table~\ref{tab:results} lists their performance metrics.
 \begin{figure}
     \centering
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../CGCNN_ensemble/sharpness.pdf}
+        \includegraphics[width=\textwidth]{../NN_ensemble/sharpness.pdf}
         \caption{\gls{NN} ensemble}\label{fig:sharpness_ensemble}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -396,7 +400,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{BNN}}\label{fig:sharpness_bnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../GP/Matern/sharpness.pdf}  % TODO:  Make and use the real sharpness plot here
+        \includegraphics[width=\textwidth]{../NNdNN/sharpness.pdf}
         \caption{\gls{dNN}}\label{fig:sharpness_dnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -404,7 +408,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{GP}}\label{fig:sharpness_gp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../GP_with_CGCNN_mean/Matern/sharpness.pdf}  % TODO:  Update this path after we update directory name
+        \includegraphics[width=\textwidth]{../NNdGP/Matern/sharpness.pdf}
         \caption{\gls{dGP}}\label{fig:sharpness_dgp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -422,12 +426,12 @@ Table~\ref{tab:results} lists their performance metrics.
         Method              & \gls{MDAE}    & \gls{MAE} & \gls{RMSE}    & \gls{MARPD}   & \gls{R2}  & \gls{Pearson} & MisCal    & Sha \\
         \midrule
         \gls{NN}            & 0.11          & 0.19      & 0.34          & 61            & 0.80      & 0.90          & N/A       & N/A \\
-        \gls{NN} ensemble   & 0.11          & 0.18      & 0.31          & 59            & 0.82      & 0.90          & 0.23      & 0.14 \\
-        \gls{BNN}           & 0.11          & 0.19      & 0.31          & 59            & 0.83      & 0.91          & 0.38      & 0.03 \\
-        \gls{dNN}           & foo           & foo       & foo           & foo           & foo       & foo           & foo       & foo \\
-        \gls{GP}            & 0.11          & 0.21      & 0.39          & 61            & 0.73      & 0.85          & 0.27      & 0.65 \\
-        \gls{dGP}           & 0.11          & 0.19      & 0.33          & 59            & 0.81      & 0.90          & 0.02      & 0.21 \\
-        \gls{PFGP}          & 0.11          & 0.20      & 0.34          & 61            & 0.80      & 0.89          & 0.04      & 0.38 \\
+        \gls{NN} ensemble   & 0.11          & 0.18      & 0.32          & 59            & 0.82      & 0.90          & 0.23      & 0.14 \\
+        \gls{BNN}           & 0.11          & 0.19      & 0.31          & 59            & 0.83      & 0.91          & 0.41      & 0.03 \\
+        \gls{dNN}           & 0.11          & 0.19      & 0.34          & 59            & 0.80      & 0.89          & 0.10      & 0.16 \\
+        \gls{GP}            & 0.11          & 0.21      & 0.39          & 61            & 0.73      & 0.85          & 0.28      & 0.65 \\
+        \gls{dGP}           & 0.11          & 0.19      & 0.33          & 59            & 0.81      & 0.90          & 0.05      & 0.21 \\
+        \gls{PFGP}          & 0.11          & 0.20      & 0.34          & 61            & 0.80      & 0.89          & 0.07      & 0.38 \\
         \bottomrule
     \end{tabular}
     \caption{Performance metrics for all methods used in this study, which include:
@@ -439,7 +443,7 @@ Table~\ref{tab:results} lists their performance metrics.
     The remaining metrics are unitless.}\label{tab:results}
 \end{table}
 
-All methods' \gls{MDAE} results are identical, and their \gls{MAE} results are within 10\% of each other.
+All methods' \gls{MDAE} results are virtually identical, and their \gls{MAE} results are within 10\% of each other.
 This suggests that all methods have comparable predictive accuracies for inliers.
 The plain \gls{GP} has a higher \gls{RMSE} value than the rest of the methods though, suggesting that \gls{GP}s may be less accurate for outliers than \gls{NN}-based methods.
 
@@ -454,7 +458,13 @@ The plain \gls{GP} has a higher \gls{RMSE} value than the rest of the methods th
 
 \section{Conclusions}
 
-% TODO:  Kevin Observations about relative accuracies, calibrations, sharpnesses, overhead. Note that we did not do any calibration, and possibly provide references on how to do that if you wanted to.
+\begin{enumerate}
+    \item{Relative accuracies}
+    \item{Relative calibrations}
+    \item{Relative sharpnesses}
+    \item{Overhead}
+    \item{Calibration}
+\end{enumerate}
 
 
 %%%%%%%%%%%%%%%%%%%% Misc %%%%%%%%%%%%%%%%%%%%
