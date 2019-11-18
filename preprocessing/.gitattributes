@@ -3,3 +3,4 @@ splits.pkl filter=lfs diff=lfs merge=lfs -text
 docs.pkl filter=lfs diff=lfs merge=lfs -text
 splits_gasdb.pkl filter=lfs diff=lfs merge=lfs -text
 splits_cathub.pkl filter=lfs diff=lfs merge=lfs -text
+splits_gasdb.pkl.gz filter=lfs diff=lfs merge=lfs -text

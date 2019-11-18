@@ -11,5 +11,4 @@ This is done by `fingerprint/fingerprint_*.ipynb`, which saves the `fingerprent/
 
 Lastly, we do a train/validate/test split using the `split_data.ipynb` notebook, which creates the `splits_*.pkl` caches.
 We use these caches in our ML experiments.
-Note that `splits_gasdb.pkl` is too large for GitHub to hold, and so you will not find it.
-Please email us if you want the file.
+Note that `splits_gasdb.pkl` is too large for GitHub to hold, and so we have included a zipped version of it instead.
