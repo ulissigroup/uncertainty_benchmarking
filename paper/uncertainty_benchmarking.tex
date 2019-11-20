@@ -160,8 +160,15 @@ We sampled the model parameters K times from the approximated posterior, and use
 We implemented the \gls{BNN} and performed variational inference using Pyro.\cite{Bingham2018}
 
 \textbf{\glsentrytext{dNN}:}
-Something about \gls{dNN}
-% TODO:  Willie
+Suppose we have trained a NN, which can return a prediction for each given
+input.  We may aim to empirically fit an additional mapping, which returns a
+prediction of the error given by the first NN for each given input. Here, we
+show \gls{dNN}, which train a secondary \gls{NN} to predict the residuals of
+the initial \gls{NN}. When training the first NN, we hold out 10\% of the
+training data.  Afterwards, we use this held-out portion, along with
+predictions from the inital NN on this held-out portion, as training data for
+the second NN. After the secondary training, this second NN can predict
+residuals for the first NN on some new set of input data.
 
 \textbf{\glsentrytext{GP}:}
 \gls{GP}s are one of the most common regression methods for producing \gls{UQ}s, and so we use them here as a baseline.
