@@ -268,6 +268,25 @@ In other words:  Sharpness is akin to the average of the \gls{ML}-predicted stan
     sha = \sqrt{\frac{1}{N} \sum_{n=1}^{N} var(F_n)}
 \end{equation}
 
+Finally, we also assess the performance of each predictive uncertainty method
+via a measure of the negative log-likelihood (NLL) on a held out set of data.
+This metric provides an overall assessment that is influenced by both the
+predictive accuracy of a method as well as the quality of its uncertainty
+quantification.
+[Previous work \cite{} has shown the NLL to be a proper scoring rule, which
+intuitively means that it provides a fair quantitative assessment of the
+uncertainty quantification, and that it can be decomposed into terms that
+relate to both calibration and sharpness. We include results for NLL since it
+is a popular performance that has been used to quantify uncertainty in a
+variety of prior work \cite{} and provides an additional single score for
+uncertainty quantification methods].
+Let $\ell_n$ denote the log of the predictive probability density function at a
+given held-out point $n$. We then define the NLL to be
+
+\begin{equation} \label{nll}
+  nll = - \frac{1}{N} \sum_{n=1}^{N} \ell_n
+\end{equation}
+
 
 %%%%%%%%%%%%%%%%%%%% Results %%%%%%%%%%%%%%%%%%%%
 
