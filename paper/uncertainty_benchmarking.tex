@@ -30,8 +30,8 @@
 \newacronym{BNN}{BNN}{Bayesian Neural Network}
 \newacronym{MLE}{MLE}{Maximum Likelihood Estimation}
 \newacronym{PFGP}{PFGP}{Penultimate-Fed Gaussian Process}
-\newacronym{dNN}{NN$\Delta$NN}{in-tandem NNs}
-\newacronym{dGP}{NN$\Delta$GP}{in-tandem NN \& GP}
+\newacronym{dNN}{NN$\Delta$NN}{in-series NNs}
+\newacronym{dGP}{NN$\Delta$GP}{in-series NN \& GP}
 \newacronym{ML}{ML}{Machine Learning}
 \newacronym{eV}{eV}{electron volts}
 
@@ -445,7 +445,18 @@ Table~\ref{tab:results} lists their performance metrics.
 
 All methods' \gls{MDAE} results are virtually identical, and their \gls{MAE} results are within 10\% of each other.
 This suggests that all methods have comparable predictive accuracies for inliers.
-The plain \gls{GP} has a higher \gls{RMSE} value than the rest of the methods though, suggesting that \gls{GP}s may be less accurate for outliers than \gls{NN}-based methods.
+The plain \gls{GP} has a higher \gls{RMSE} value than the rest of the methods though.
+Thus our results suggest that our \gls{NN}-based methods are more accurate at outlier prediction than our sole non-\gls{NN}-based method.
+Each of our \gls{NN}-based methods may not have practically different accuracies between each other though.
+
+Regarding calibration:  The \gls{NN} ensemble and \gls{BNN} are overconfident; the \gls{GP} is underconfident; and the \gls{dNN}, \gls{dGP}, and \gls{PFGP} models are relatively calibrated.
+The three more calibrated methods all share a characteristic that the other methods do not:  They all start with a \gls{NN} that is dedicated for prediction alone, and then they end with some other in-series method to estimate uncertainty.
+Interestingly, this in-series method of learning predictions and then learning uncertainties is similar in spirit to how deep networks ``learn in stages'' at each subseqent hidden layer.
+
+Regarding sharpness:  The \gls{NN} ensemble and \gls{BNN} yield the sharpest uncertainties, although both do so at the cost of calibration.
+Among the three more calibrated models, the \gls{PFGP} yields the least sharp uncertainties (0.38 eV); \gls{dGP} yields a moderate sharpness (0.21 eV); and \gls{dNN} yields the lowest sharpness (0.16 eV).
+Note how, in these results, \gls{GP}-based \gls{UQ} methods tend to yield less sharp uncertainties than methods based purely on \gls{NN}s.
+This suggests that \gls{GP}s may yield more conservative \gls{UQ}s, for better or for worse.
 
 \begin{enumerate}
     \item{Blocking results on best candidates (maybe put in SI)}
@@ -471,8 +482,6 @@ The plain \gls{GP} has a higher \gls{RMSE} value than the rest of the methods th
 
 \section*{Code availability} Visit \texttt{https://github.com/ulissigroup/uncertainty\_benchmarking} for the code used to create the results discussed in this paper.
 The code dependencies are listed inside the repository.
-Due to GitHub's constraints on file sizes, the raw data cache used in this work (\texttt{splits\_gasdb.pkl}) could not be put into the repository directly.
-This file is available upon request.
 
 \section*{Author information} Corresponding author email:  zulissi@andrew.cmu.edu.
 The authors declare no competing financial interest.
