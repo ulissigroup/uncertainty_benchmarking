@@ -188,7 +188,7 @@ show \gls{dNN}, which train a secondary \gls{NN} to predict the residuals of
 the initial \gls{NN}. When training the first NN, we hold out 10\% of the
 training data.  Afterwards, we use this held-out portion, along with
 predictions from the inital NN on this held-out portion, as training data for
-the second NN. After the secondary training, this second NN can predict
+the second NN.\@ After the secondary training, this second NN can predict
 residuals for the first NN on some new set of input data.
 
 \textbf{\glsentrytext{GP}:}
@@ -273,12 +273,12 @@ via a measure of the negative log-likelihood (NLL) on a held out set of data.
 This metric provides an overall assessment that is influenced by both the
 predictive accuracy of a method as well as the quality of its uncertainty
 quantification.
-[Previous work \cite{} has shown the NLL to be a proper scoring rule, which
+[Previous work~\cite{} has shown the NLL to be a proper scoring rule, which
 intuitively means that it provides a fair quantitative assessment of the
 uncertainty quantification, and that it can be decomposed into terms that
 relate to both calibration and sharpness. We include results for NLL since it
 is a popular performance that has been used to quantify uncertainty in a
-variety of prior work \cite{} and provides an additional single score for
+variety of prior work~\cite{} and provides an additional single score for
 uncertainty quantification methods].
 Let $\ell_n$ denote the log of the predictive probability density function at a
 given held-out point $n$. We then define the NLL to be
