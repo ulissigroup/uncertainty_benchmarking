@@ -133,10 +133,19 @@ After tuning, we calculated the training set results and present them in this pa
 Note that the test results were obtained using models that were trained only using the training set, not the validation set.
 This is acceptable because we only seek to compare methods here, not to optimize them.
 
+
+
 \subsection{Regression methods}
 
-% TODO:  Willie to make intro to predictive uncertainty methods.
-Figure~\ref{fig:methods} illustrates all the methods we investigated in this study.
+We explore a number of predictive \gls{UQ} methods that aim to quantify the
+uncertainty for regression procedures, where the predicted quantity is a
+continuous variable. In order to standardize the assessment of performance, we
+ensure that each \gls{UQ} method returns predictive uncertainty results in a
+consistent format: a distribution over possible outcomes of the predicted
+quantity for any specified input point. This result format allows us to compute
+all of the predictive uncertainty performance metrics which we will introduce
+in subsequent sections. Figure~\ref{fig:methods} illustrates all of the methods
+we investigate in this study, and we describe each method in detail below.
 
 \begin{figure}
     \centering
@@ -216,6 +225,8 @@ To define the \gls{GP}, we assumed a constant mean and used a Matern covariance 
 We trained the length scale of the Matern kernel using the \gls{MLE} method with a Gaussian likelihood.
 All \gls{GP} training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
 % TODO:  Willie double-check the wording here. I think we use a Gaussian likelihood, but does make it no longer MLE? You know best.
+
+
 
 \subsection{Performance metrics}
 
