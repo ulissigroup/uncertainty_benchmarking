@@ -167,11 +167,13 @@ We sampled the model parameters K times from the approximated posterior, and use
 We implemented the \gls{BNN} and performed variational inference using Pyro.\cite{Bingham2018}
 
 \textbf{\glsentrytext{dNN}:}
-Suppose we have trained a NN, which can return a prediction for each given input.
-We may aim to empirically fit an additional mapping, which returns a prediction of the error given by the first NN for each given input.
-Here, we show \gls{dNN}, which train a secondary \gls{NN} to predict the residuals of the initial \gls{NN}.
-When training the first NN, we hold out 10\% of the training data.
-Afterwards, we use this held-out portion, along with predictions from the inital NN on this held-out portion, as training data for the second NN.\@ After the secondary training, this second NN can predict residuals for the first NN on some new set of input data.
+Suppose we have trained a \gls{NN}.
+We may aim to empirically fit an additional mapping that predicts the error of the first \gls{NN}.
+Here we show \gls{dNN}, which trains a secondary \gls{NN} to predict the residuals of the initial \gls{NN}.
+When training the first \gls{NN}, we hold out 10\% of the training data.
+Afterwards, we use the residuals of the initial \gls{NN} on the held-out portion as training data for the second \gls{NN}.
+After the secondary training, this second \gls{NN} can predict residuals for the first \gls{NN} on some new set of input data.
+The predictions of the second \gls{NN} can then be used as uncertainty estimates.
 
 \textbf{\glsentrytext{GP}:}
 \gls{GP}s are one of the most common regression methods for producing \gls{UQ}s, and so we use them here as a baseline.
@@ -181,12 +183,11 @@ Specifically:  We use the atomic numbers of these elements, their Pauling electr
 To ensure that these features interacted well with the \gls{GP}'s kernel, we normalized each of the features to have a mean of zero and standard deviation of one.
 Reference \citet{Tran2018} for additional details.
 To define the \gls{GP}, we assumed a constant mean and used a Matern covariance kernel.
-We trained the length scale of the Matern kernel using the \gls{MLE} method with a Gaussian likelihood.
+We trained the length scale of the Matern kernel using the \gls{MLE} method.
 All \gls{GP} training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
-% TODO:  Willie double-check the wording here. I think we use a Gaussian likelihood, but does make it no longer MLE? You know best.
 
 \textbf{\glsentrytext{dGP}:}
-\gls{GP}s are Bayesian models, in which a prior distribution is first specified, and then updated given observations, to yield a posterior distribution. 
+\gls{GP}s are Bayesian models in which a prior distribution is first specified and then updated given observations to yield a posterior distribution. 
 The mean of this posterior distribution is used for regression, and the covariance matrix is used for \gls{UQ}. 
 Typically, in lieu of any additional prior knowledge, practitioners will take the prior distribution to have zero-mean. 
 However, we could instead supply an alternative curve for the prior mean, and then perform the usual Bayesian updates to compute the posterior of this \gls{GP} given observations. 
@@ -204,9 +205,8 @@ We call this a \gls{PFGP}.
 In this case, we used the baseline \gls{NN} as the network from which we obtained the penultimate outputs.
 We also normalized the penultimate outputs of the \gls{NN} so that each output would have a mean of zero and a standard deviation of one.
 To define the \gls{GP}, we assumed a constant mean and used a Matern covariance kernel.
-We trained the length scale of the Matern kernel using the \gls{MLE} method with a Gaussian likelihood.
+We trained the length scale of the Matern kernel using the \gls{MLE} method.
 All \gls{GP} training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
-% TODO:  Willie double-check the wording here. I think we use a Gaussian likelihood, but does make it no longer MLE? You know best.
 
 
 \subsection{Performance metrics}
@@ -249,12 +249,13 @@ In other words:  Sharpness is akin to the average of the \gls{ML}-predicted stan
     sha = \sqrt{\frac{1}{N} \sum_{n=1}^{N} var(F_n)}
 \end{equation}
 
-Finally, we also assess the performance of each predictive uncertainty method via a measure of the \gls{NLL} on a held out set of data.
+Finally, we assess the performance of each predictive uncertainty method via a the \gls{NLL} on a held out set of data.
 This metric provides an overall assessment that is influenced by both the predictive accuracy of a method as well as the quality of its uncertainty quantification.
-Previous work~\cite{} has shown the \gls{NLL} to be a proper scoring rule, which intuitively means that it provides a fair quantitative assessment of the uncertainty quantification, and that it can be decomposed into terms that relate to both calibration and sharpness.
-We include results for \gls{NLL} since it is a popular performance that has been used to quantify uncertainty in a variety of prior work~\cite{} and provides an additional single score for uncertainty quantification methods.
+Previous work~\cite{} has shown the \gls{NLL} to be a proper scoring rule, which intuitively means that it provides a fair quantitative assessment of the uncertainty quantification and that it can be decomposed into terms that relate to both calibration and sharpness.
 % TODO:  [Willie] Find a citation for this
-Let $\ell_n$ denote the log of the predictive probability density function at a given held-out point $n$.
+We include results for \gls{NLL} since it is a popular performance metric that has been used to quantify uncertainty in a variety of prior work~\cite{} and provides an additional single score for uncertainty quantification methods.
+% TODO:  [Willie] Find a citation for this
+Let $\ell_n$ denote the natural logarithm of the predictive probability density function at a given held-out point $n$.
 We then define the \gls{NLL} to be:
 
 \begin{equation}\label{nll}
