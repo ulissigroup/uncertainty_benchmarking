@@ -34,6 +34,7 @@
 \newacronym{dGP}{NN$\Delta$GP}{in-series NN \& GP}
 \newacronym{ML}{ML}{Machine Learning}
 \newacronym{eV}{eV}{electron volts}
+\newacronym{NLL}{NLL}{negative log-likelihood}
 
 
 %%%%%%%%%%%%%%%%%%%% Title/Abstract %%%%%%%%%%%%%%%%%%%%
@@ -82,19 +83,10 @@ For example: \citet{Peterson2016} has used a neural network to perform online ac
 \citet{Jinnouchi2019} have used online active learning to accelerate molecular dynamics simulations.
 Each of these active methods are underpinned by models with \gls{UQ}, which has garnered increasing attention itself.\cite{Peterson2017, Musil2019}
 
-The goal of \gls{UQ} in predictive models is to quantify the relative
-likelihood of potential true outcomes associated with a predicted quantity, and
-to accurately assess the probabilities of these outcomes. For example, given an
-input for which we wish to make a prediction, a predictive \gls{UQ} method
-might return a confidence interval that aims to capture the true outcome a
-specified percentage of the time, or might return a probability distribution
-over possible outcomes. Performance metrics for predictive \gls{UQ} methods aim
-to assess how well a given quantification of the probabilities of potential
-true outcomes adheres to a set of observations of these outcomes. 
-%Some of the performance metrics for predictive \gls{UQ} are agnostic to
-%prediction performance---they provide an assessment of the uncertainty
-%independent of the predictive accuracy (i.e. a method can predict badly, but
-%could still accurately quantify its own uncertainty).
+The goal of \gls{UQ} in predictive models is to quantify the relative likelihood of potential true outcomes associated with a predicted quantity, and to accurately assess the probabilities of these outcomes.
+For example, given an input for which we wish to make a prediction, a predictive \gls{UQ} method might return a confidence interval that aims to capture the true outcome a specified percentage of the time, or might return a probability distribution over possible outcomes.
+Performance metrics for predictive \gls{UQ} methods aim to assess how well a given quantification of the probabilities of potential true outcomes adheres to a set of observations of these outcomes.
+Some of the performance metrics for predictive \gls{UQ} are agnostic to prediction performance---they provide an assessment of the uncertainty independent of the predictive accuracy (i.e.\ a method can predict badly, but could still accurately quantify its own uncertainty).
 
 To our knowledge though, we have not seen many comparisons of different methods for \gls{UQ} within the field of catalysis and materials informatics.
 Here we attempt to resolve this issue by benchmarking different methods for \gls{UQ} (Figure~\ref{fig:overview}).
@@ -134,18 +126,12 @@ Note that the test results were obtained using models that were trained only usi
 This is acceptable because we only seek to compare methods here, not to optimize them.
 
 
-
 \subsection{Regression methods}
 
-We explore a number of predictive \gls{UQ} methods that aim to quantify the
-uncertainty for regression procedures, where the predicted quantity is a
-continuous variable. In order to standardize the assessment of performance, we
-ensure that each \gls{UQ} method returns predictive uncertainty results in a
-consistent format: a distribution over possible outcomes of the predicted
-quantity for any specified input point. This result format allows us to compute
-all of the predictive uncertainty performance metrics which we will introduce
-in subsequent sections. Figure~\ref{fig:methods} illustrates all of the methods
-we investigate in this study, and we describe each method in detail below.
+We explore a number of predictive \gls{UQ} methods that aim to quantify the uncertainty for regression procedures, where the predicted quantity is a continuous variable.
+In order to standardize the assessment of performance, we ensure that each \gls{UQ} method returns predictive uncertainty results in a consistent format:  a distribution over possible outcomes of the predicted quantity for any specified input point.
+This result format allows us to compute all of the predictive uncertainty performance metrics which we will introduce in subsequent sections.
+Figure~\ref{fig:methods} illustrates all of the methods we investigate in this study, and we describe each method in detail below.
 
 \begin{figure}
     \centering
@@ -181,15 +167,11 @@ We sampled the model parameters K times from the approximated posterior, and use
 We implemented the \gls{BNN} and performed variational inference using Pyro.\cite{Bingham2018}
 
 \textbf{\glsentrytext{dNN}:}
-Suppose we have trained a NN, which can return a prediction for each given
-input.  We may aim to empirically fit an additional mapping, which returns a
-prediction of the error given by the first NN for each given input. Here, we
-show \gls{dNN}, which train a secondary \gls{NN} to predict the residuals of
-the initial \gls{NN}. When training the first NN, we hold out 10\% of the
-training data.  Afterwards, we use this held-out portion, along with
-predictions from the inital NN on this held-out portion, as training data for
-the second NN.\@ After the secondary training, this second NN can predict
-residuals for the first NN on some new set of input data.
+Suppose we have trained a NN, which can return a prediction for each given input.
+We may aim to empirically fit an additional mapping, which returns a prediction of the error given by the first NN for each given input.
+Here, we show \gls{dNN}, which train a secondary \gls{NN} to predict the residuals of the initial \gls{NN}.
+When training the first NN, we hold out 10\% of the training data.
+Afterwards, we use this held-out portion, along with predictions from the inital NN on this held-out portion, as training data for the second NN.\@ After the secondary training, this second NN can predict residuals for the first NN on some new set of input data.
 
 \textbf{\glsentrytext{GP}:}
 \gls{GP}s are one of the most common regression methods for producing \gls{UQ}s, and so we use them here as a baseline.
@@ -225,7 +207,6 @@ To define the \gls{GP}, we assumed a constant mean and used a Matern covariance 
 We trained the length scale of the Matern kernel using the \gls{MLE} method with a Gaussian likelihood.
 All \gls{GP} training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
 % TODO:  Willie double-check the wording here. I think we use a Gaussian likelihood, but does make it no longer MLE? You know best.
-
 
 
 \subsection{Performance metrics}
@@ -268,22 +249,15 @@ In other words:  Sharpness is akin to the average of the \gls{ML}-predicted stan
     sha = \sqrt{\frac{1}{N} \sum_{n=1}^{N} var(F_n)}
 \end{equation}
 
-Finally, we also assess the performance of each predictive uncertainty method
-via a measure of the negative log-likelihood (NLL) on a held out set of data.
-This metric provides an overall assessment that is influenced by both the
-predictive accuracy of a method as well as the quality of its uncertainty
-quantification.
-[Previous work~\cite{} has shown the NLL to be a proper scoring rule, which
-intuitively means that it provides a fair quantitative assessment of the
-uncertainty quantification, and that it can be decomposed into terms that
-relate to both calibration and sharpness. We include results for NLL since it
-is a popular performance that has been used to quantify uncertainty in a
-variety of prior work~\cite{} and provides an additional single score for
-uncertainty quantification methods].
-Let $\ell_n$ denote the log of the predictive probability density function at a
-given held-out point $n$. We then define the NLL to be
+Finally, we also assess the performance of each predictive uncertainty method via a measure of the \gls{NLL} on a held out set of data.
+This metric provides an overall assessment that is influenced by both the predictive accuracy of a method as well as the quality of its uncertainty quantification.
+Previous work~\cite{} has shown the \gls{NLL} to be a proper scoring rule, which intuitively means that it provides a fair quantitative assessment of the uncertainty quantification, and that it can be decomposed into terms that relate to both calibration and sharpness.
+We include results for \gls{NLL} since it is a popular performance that has been used to quantify uncertainty in a variety of prior work~\cite{} and provides an additional single score for uncertainty quantification methods.
+% TODO:  [Willie] Find a citation for this
+Let $\ell_n$ denote the log of the predictive probability density function at a given held-out point $n$.
+We then define the \gls{NLL} to be:
 
-\begin{equation} \label{nll}
+\begin{equation}\label{nll}
   nll = - \sum_{n=1}^{N} \ell_n
 \end{equation}
 
