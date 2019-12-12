@@ -220,7 +220,7 @@ In this case, $x_n$ is a DFT-calculated adsorption energy and $\hat{x}_n$ is the
 The ensemble of these metrics provide a more robust view of accuracy than any one metric can provide alone.
 
 \begin{equation}\label{eq:marpd}
-    MARPD = \frac{1}{N} \sum_{i=1}^{N} \abs{100 \cdot \frac{\hat{x}_n - x_n}{\abs{\hat{x}_n} + \abs{x_n}}}
+    MARPD = \frac{1}{N} \sum_{n=1}^{N} \abs{100 \cdot \frac{\hat{x}_n - x_n}{\abs{\hat{x}_n} + \abs{x_n}}}
 \end{equation}
 
 To assess the calibration (or ``honesty'') of these models' UQs, we created calibration curves. A calibration curve ``displays the true frequency of points in each [prediction] interval relative to the predicted fraction of points in that interval'', as outlined by \citet{Kuleshov2018}.
