@@ -489,7 +489,7 @@ This shows that better \gls{NLL} values correlate with relatively conservative e
 In other words:  If we use \gls{NLL} as our main performance metric, then we will favor under-confident \gls{UQ} estimates in lieu of over-confident estimates.
 
 Given the performance metrics for accuracy, calibration, sharpness, and \gls{NLL}, we expect the \gls{dGP} method to yield the best performing \gls{UQ} model for our dataset.
-It yields the lowest miscalibration area and \gls{NLL} while maintaining a relatively moderate accuracy and sharpness.
+It yields the lowest miscalibration area and \gls{NLL} while maintaining a relatively competitive accuracy and moderate sharpness.
 
 When choosing \gls{UQ} methods for different applications though, other factors should be considered.
 For example:  Although the \gls{dGP} method performed the best here, it required the use of a hand-crafted set of features.
@@ -512,13 +512,25 @@ It follows that further optimization of the \gls{BNN} would be non-trivial and m
 
 \section{Conclusions}
 
-\begin{enumerate}
-    \item{Relative accuracies}
-    \item{Relative calibrations}
-    \item{Relative sharpnesses}
-    \item{Overhead}
-    \item{Calibration}
-\end{enumerate}
+We outlined a procedure for comparing different methods for \glsentryfull{UQ}.
+This procedure considers the accuracy of each method, the honesty of their uncertainty estimates (i.e., their calibration), and the size of their uncertainty estimates (i.e., their sharpness).
+To assess accuracy, we outlined a common set of error metrics such as \gls{MAE} or \gls{RMSE}, among others.
+To assess calibration, we showed how to create, interpret, and quantify calibration curves.
+To assess sharpness, we showed how to calculate and plot sharpness.
+To assess all three aspects simultaneously, we suggest using the \glsentryfull{NLL} as a performance metric.
+The ensemble of all these metrics and figures can then be used to judge the relative performance of various UQ methods in a holistic fashion.
+
+As a case sutdy, we tested six different methods for predicting \glsentryfull{DFT} calculated adsorption energies with \gls{UQ}.
+The best performing method was an \glsentryfull{dGP}, which used a \gls{NN} to make adsorption energy predictions and then used a subsequent \gls{GP} to make uncertanity estimates.
+Our studies also showed that the \gls{GP}-based methods we tested tended to yield higher and more conservative uncertainty estimates than the methods that used only \gls{NN}s and \gls{NN} derivatives.
+We also found that in-series methods tended to yield more calibrated models---i.e., methods that use one model to make value predictions and then a subsequent model to make uncertainty estimates were more calibrated than models that attempted to make value and uncertainty predictions simultaneously.
+These results are limited to our dataset though.
+Results may vary for studies with different applications, different models, or different hyperparameters.
+But the underpinning procedure we used to compare each of these models is still broadly applicable.
+
+Note that it would be possible to recalibrate\cite{Kuleshov2018} each of the models in this study to improve their uncertainty estimates.
+We purposefully ommitted recalibration in this study to (1) simplify the illustration of the assessment procedure; (2) assess the innate performance of each of these UQ methods without confounding with recalibration methods; and (3) reduce overhead investment.
+Future work should consider recalibration if the feasible UQ methods provide insufficiently calibrated uncertainty predictions
 
 
 %%%%%%%%%%%%%%%%%%%% Misc %%%%%%%%%%%%%%%%%%%%
