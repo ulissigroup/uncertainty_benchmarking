@@ -25,7 +25,6 @@
 \newacronym{MDAE}{MDAE}{Median Absolute Error}
 \newacronym{MARPD}{MARPD}{Mean Absolute Relative Percent Difference}
 \newacronym{R2}{R\textsuperscript{2}}{R\textsuperscript{2} correlation coefficient}
-\newacronym{Pearson}{PPMCC}{Pearson Product-Moment Correlation coefficent}
 \newacronym{NN}{NN}{crystal graph convolutional Neural Network}
 \newacronym{BNN}{BNN}{Bayesian Neural Network}
 \newacronym{MLE}{MLE}{Maximum Likelihood Estimation}
@@ -211,11 +210,11 @@ All \gls{GP} training and predictions were done with GPU acceleration as impleme
 
 \subsection{Performance metrics}
 
-We used six different metrics to quantify the accuracy of the various models:  \gls{MDAE}, \gls{RMSE}, \gls{MAE}, \gls{MARPD}, \gls{R2}, and \gls{Pearson}.
+We used six different metrics to quantify the accuracy of the various models:  \gls{MDAE}, \gls{RMSE}, \gls{MAE}, \gls{MARPD}, and \gls{R2}.
 We used \gls{MDAE} because is insensitive to outliers and is therefore a good measure of accuracy for the majority of the data.
 We used \gls{RMSE} because it is sensitive to outliers and is therefore a good measure of worst-case accuracy.
 We used \gls{MAE} because it lies between \gls{MDAE} and \gls{RMSE} in terms of sensitivity to outliers.
-We used \gls{MARPD}, \gls{R2}, and \gls{Pearson} because they provide normalized measures of accuracy that may be more interpretable for those unfamiliar with adsorption energy measurements in \gls{eV}.
+We used \gls{MARPD} and \gls{R2} because they provide normalized measures of accuracy that may be more interpretable for those unfamiliar with adsorption energy measurements in \gls{eV}.
 \gls{MARPD} values were calculated with Equation~\ref{eq:marpd} where $n$ is the index of a data point, $N$ is the total number of data points, $x_n$ is the true value of the data point, and $\hat{x}_n$ is the model's estimate of $x_n$.
 In this case, $x_n$ is a DFT-calculated adsorption energy and $\hat{x}_n$ is the surrogate-model-calculated adsorption energy.
 The ensemble of these metrics provide a more robust view of accuracy than any one metric can provide alone.
@@ -256,10 +255,11 @@ Previous work~\cite{} has shown the \gls{NLL} to be a proper scoring rule, which
 We include results for \gls{NLL} since it is a popular performance metric that has been used to quantify uncertainty in a variety of prior work~\cite{} and provides an additional single score for uncertainty quantification methods.
 % TODO:  [Willie] Find a citation for this
 Let $\ell_n$ denote the natural logarithm of the predictive probability density function at a given held-out point $n$.
-We then define the \gls{NLL} to be:
+We then define \gls{NLL} using Equation~\ref{eq:nll}.
+In general, a lower \gls{NLL} value indicates a better fit.
 
-\begin{equation}\label{nll}
-  nll = - \sum_{n=1}^{N} \ell_n
+\begin{equation}\label{eq:nll}
+  NLL = - \sum_{n=1}^{N} \ell_n
 \end{equation}
 
 
@@ -447,24 +447,23 @@ Table~\ref{tab:results} lists their performance metrics.
     \centering
     \begin{tabular}{lrrrrrrrr}
         \toprule
-        Method              & \gls{MDAE}    & \gls{MAE} & \gls{RMSE}    & \gls{MARPD}   & \gls{R2}  & \gls{Pearson} & MisCal    & Sha \\
+        Method              & \gls{MDAE}    & \gls{MAE} & \gls{RMSE}    & \gls{MARPD}   & \gls{R2}  & MisCal    & Sha   & \gls{NLL} [$\cdot$10\textsuperscript{3}] \\
         \midrule
-        \gls{NN}            & 0.11          & 0.19      & 0.34          & 61            & 0.80      & 0.90          & N/A       & N/A \\
-        \gls{NN} ensemble   & 0.11          & 0.18      & 0.32          & 59            & 0.82      & 0.90          & 0.23      & 0.14 \\
-        \gls{BNN}           & 0.11          & 0.19      & 0.31          & 59            & 0.83      & 0.91          & 0.41      & 0.03 \\
-        \gls{dNN}           & 0.11          & 0.19      & 0.34          & 59            & 0.80      & 0.89          & 0.10      & 0.16 \\
-        \gls{GP}            & 0.11          & 0.21      & 0.39          & 61            & 0.73      & 0.85          & 0.28      & 0.65 \\
-        \gls{dGP}           & 0.11          & 0.19      & 0.33          & 59            & 0.81      & 0.90          & 0.05      & 0.21 \\
-        \gls{PFGP}          & 0.11          & 0.20      & 0.34          & 61            & 0.80      & 0.89          & 0.07      & 0.38 \\
+        \gls{NN}            & 0.11          & 0.19      & 0.34          & 61            & 0.80      & N/A       & N/A   & \\
+        \gls{NN} ensemble   & 0.11          & 0.18      & 0.32          & 59            & 0.82      & 0.23      & 0.14  & 192.08 \\
+        \gls{BNN}           & 0.11          & 0.19      & 0.31          & 59            & 0.83      & 0.41      & 0.03  & 669.61 \\
+        \gls{dNN}           & 0.11          & 0.19      & 0.34          & 59            & 0.80      & 0.10      & 0.16  & 18.61 \\
+        \gls{GP}            & 0.11          & 0.21      & 0.39          & 61            & 0.73      & 0.28      & 0.65  & 6.41 \\
+        \gls{dGP}           & 0.11          & 0.19      & 0.33          & 59            & 0.81      & 0.05      & 0.21  & 6.09 \\
+        \gls{PFGP}          & 0.11          & 0.20      & 0.34          & 61            & 0.80      & 0.07      & 0.38  & 14.65 \\
         \bottomrule
     \end{tabular}
     \caption{Performance metrics for all methods used in this study, which include:
     \glsentryfull{MDAE}, \glsentryfull{MAE}, \glsentryfull{RMSE}, \glsentryfull{MARPD},
-    \glsentryfull{R2}, \glsentryfull{Pearson},
-    miscalibration area (MisCal), and sharpness (Sha).
+    \glsentryfull{R2}, miscalibration area (MisCal), sharpness (Sha), and \glsentryfull{NLL}.
     The units of \gls{MDAE}, \gls{MAE}, \gls{RMSE}, and sharpness are all in \gls{eV}.
     The units of \gls{MARPD} are in \%.
-    The remaining metrics are unitless.}\label{tab:results}
+    The miscalibration area and \gls{NLL} are unitless.}\label{tab:results}
 \end{table}
 
 All methods' \gls{MDAE} results are virtually identical, and their \gls{MAE} results are within 10\% of each other.
