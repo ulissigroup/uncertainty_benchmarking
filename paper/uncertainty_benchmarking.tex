@@ -273,6 +273,7 @@ Let us first discuss the results of our \gls{NN} ensemble for illustrative purpo
 Figure~\ref{fig:results_example} contains a parity plot, calibration curve, and predicted-uncertainty distribution of our \gls{NN} ensemble model.
 The parity plot shows the accuracy of the model; the calibration curve shows the honesty of the model's uncertainty predictions; and the uncertainty distribution shows the sharpness of model's uncertainty predictions.
 Accurate models have parity plots whose points tend to fall near the diagonal parity line.
+Calibrated models have calibration curves that approach the ideal diganoal line.
 Sharp models have uncertainty distributions that tend towards zero.
 Note that sharpness should not be won at the cost of calibration.
 
@@ -449,7 +450,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \toprule
         Method              & \gls{MDAE}    & \gls{MAE} & \gls{RMSE}    & \gls{MARPD}   & \gls{R2}  & MisCal    & Sha   & \gls{NLL} [$\cdot$10\textsuperscript{3}] \\
         \midrule
-        \gls{NN}            & 0.11          & 0.19      & 0.34          & 61            & 0.80      & N/A       & N/A   & \\
+        \gls{NN}            & 0.11          & 0.19      & 0.34          & 61            & 0.80      & N/A       & N/A   & N/A \\
         \gls{NN} ensemble   & 0.11          & 0.18      & 0.32          & 59            & 0.82      & 0.23      & 0.14  & 192.08 \\
         \gls{BNN}           & 0.11          & 0.19      & 0.31          & 59            & 0.83      & 0.41      & 0.03  & 669.61 \\
         \gls{dNN}           & 0.11          & 0.19      & 0.34          & 59            & 0.80      & 0.10      & 0.16  & 18.61 \\
@@ -466,7 +467,7 @@ Table~\ref{tab:results} lists their performance metrics.
     The miscalibration area and \gls{NLL} are unitless.}\label{tab:results}
 \end{table}
 
-All methods' \gls{MDAE} results are virtually identical, and their \gls{MAE} results are within 10\% of each other.
+Regarding accuracy:  All methods' \gls{MDAE} results are virtually identical, and their \gls{MAE} results are within 10\% of each other.
 This suggests that all methods have comparable predictive accuracies for inliers.
 The plain \gls{GP} has a higher \gls{RMSE} value than the rest of the methods though.
 Thus our results suggest that our \gls{NN}-based methods are more accurate at outlier prediction than our sole non-\gls{NN}-based method.
@@ -478,14 +479,33 @@ Interestingly, this in-series method of learning predictions and then learning u
 
 Regarding sharpness:  The \gls{NN} ensemble and \gls{BNN} yield the sharpest uncertainties, although both do so at the cost of calibration.
 Among the three more calibrated models, the \gls{PFGP} yields the least sharp uncertainties (0.38 eV); \gls{dGP} yields a moderate sharpness (0.21 eV); and \gls{dNN} yields the lowest sharpness (0.16 eV).
-Note how, in these results, \gls{GP}-based \gls{UQ} methods tend to yield less sharp uncertainties than methods based purely on \gls{NN}s.
+Note how \gls{GP}-based \gls{UQ} methods tend to yield less sharp uncertainties than methods based purely on \gls{NN}s.
 This suggests that \gls{GP}s may yield more conservative \gls{UQ}s, for better or for worse.
 
-\begin{enumerate}
-    \item{Blocking results on best candidates (maybe put in SI)}
-    \item{Cost of computing each method (if it’s there)}
-    \item{Human overhead and difficulty}
-\end{enumerate}
+Regarding \gls{NLL}:  The \gls{dGP} and \gls{GP} methods yield the best (i.e., lowest) \gls{NLL} values.
+Note how the under-confident \gls{GP} model has a worse miscalibration area and sharpness than the \gls{dNN} and \gls{PFGP} models, but a better \gls{NLL} value.
+Simultaneously, the two most over-confident models (\gls{NN} ensemble and \gls{BNN}) yield the worst \gls{NLL} results.
+This shows that better \gls{NLL} values correlate with relatively conservative estimates of \gls{UQ}, but not with relatively liberal estimates.
+In other words:  If we use \gls{NLL} as our main performance metric, then we will favor under-confident \gls{UQ} estimates in lieu of over-confident estimates.
+
+Given the performance metrics for accuracy, calibration, sharpness, and \gls{NLL}, we expect the \gls{dGP} method to yield the best performing \gls{UQ} model for our dataset.
+It yields the lowest miscalibration area and \gls{NLL} while maintaining a relatively moderate accuracy and sharpness.
+
+When choosing \gls{UQ} methods for different applications though, other factors should be considered.
+For example:  Although the \gls{dGP} method performed the best here, it required the use of a hand-crafted set of features.
+If future researchers wish to use the \gls{dGP} method to predict other properties from atomic structures, they may have to define their own set of features.
+This process of feature engineering is non-trivial and varies from application to application.
+In some cases, it may be easier to use a \gls{UQ} method that does not require any additional features beyond the \gls{NN} input, such as \gls{dNN} or \gls{PFGP}.
+
+Another factor to consider is the overhead cost of implementation.
+For example:  The \gls{NN} ensemble method is arguably the simplest \gls{NN}-based \gls{UQ} method used here and may be the easiest or fastest method to implement.
+Conversely, \gls{NN} ensembles also have a higher computational training cost than some of the other methods used here, such as \gls{dNN} or \gls{PFGP}.
+This high training cost is exacerbated if the ensemble is meant to be used in an active framework where the model needs to be trained continuously.
+As another example:  The \gls{BNN} method yielded perhaps the worst results of all the methods studied here.
+It could be argued that further optimization of the \gls{BNN} could have resulted in higher performance.
+But creation and training of \gls{BNN}s is still an active area of research with less literature and support than non-Bayesian \gls{NN}s or \gls{GP}s.
+This lack of support led to us spending nearly twice as long creating a \gls{BNN} compared to the other methods.
+It follows that further optimization of the \gls{BNN} would be non-trivial and may not be worth the overhead investment.
 
 
 %%%%%%%%%%%%%%%%%%%% Conclusions %%%%%%%%%%%%%%%%%%%%
