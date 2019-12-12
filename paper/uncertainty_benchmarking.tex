@@ -28,7 +28,7 @@
 \newacronym{NN}{NN}{crystal graph convolutional Neural Network}
 \newacronym{BNN}{BNN}{Bayesian Neural Network}
 \newacronym{MLE}{MLE}{Maximum Likelihood Estimation}
-\newacronym{PFGP}{PFGP}{Penultimate-Fed Gaussian Process}
+\newacronym{CFGP}{CFGP}{Convolution-Fed Gaussian Process}
 \newacronym{dNN}{NN$\Delta$NN}{in-series NNs}
 \newacronym{dGP}{NN$\Delta$GP}{in-series NN \& GP}
 \newacronym{ML}{ML}{Machine Learning}
@@ -195,14 +195,14 @@ We call this method \gls{dGP}.
 For the \gls{GP}, we used a Matern covariance kernel, where we fit the kernel hyperparameters using \gls{MLE}. 
 All \gls{GP} training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
 
-\textbf{\glsentrytext{PFGP}:}
+\textbf{\glsentrytext{CFGP}:}
 A limitation of using this formulation of a \gls{GP} with \gls{NN}-predicted mean is that it requires the use of hand-crafted features for the \gls{GP}.
 This requirement reduces the transferability of the method to other applications where such features may not be readily available.
-To address this, we formulated a different method whereby we first train a neural network on the learning task (i.e., predict adsorption energies), and then we use the outputs of the penultimate layer of the network as features in a new \gls{GP}.
+To address this, we formulated a different method whereby we first train a neural network on the learning task (i.e., predict adsorption energies), and then we use the pooled outputs of the convolutional layers of the network as features in a new \gls{GP}.
 The \gls{GP} would then be trained to use these features to produce both mean and uncertainty predictions on the adsorption energies.
-We call this a \gls{PFGP}.
-In this case, we used the baseline \gls{NN} as the network from which we obtained the penultimate outputs.
-We also normalized the penultimate outputs of the \gls{NN} so that each output would have a mean of zero and a standard deviation of one.
+We call this a \gls{CFGP}.
+In this case, we used the baseline \gls{NN} as the network from which we obtained the convolution outputs.
+We also normalized the convolution outputs of the \gls{NN} so that each output would have a mean of zero and a standard deviation of one.
 To define the \gls{GP}, we assumed a constant mean and used a Matern covariance kernel.
 We trained the length scale of the Matern kernel using the \gls{MLE} method.
 All \gls{GP} training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
@@ -320,8 +320,8 @@ Figure~\ref{fig:error_bars} illustrates this point by plotting calibration curve
         \caption{calibration of \gls{GP}}\label{fig:calibration_example_gp}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../NNdGP/Matern/calibration.pdf}
-        \caption{calibration of \gls{dGP}}\label{fig:calibration_example_pfgp}
+        \includegraphics[width=\textwidth]{../CFGP/Matern/calibration.pdf}
+        \caption{calibration of \gls{CFGP}}\label{fig:calibration_example_cfgp}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
         \includegraphics[width=\textwidth]{../NN_ensemble/error_bar_parity.pdf}
@@ -332,10 +332,10 @@ Figure~\ref{fig:error_bars} illustrates this point by plotting calibration curve
         \caption{parity of \gls{GP}}\label{fig:error_bar_gp}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../NNdGP/Matern/error_bar_parity.pdf}
-        \caption{parity of \gls{dGP}}\label{fig:error_bar_pfgp}
+        \includegraphics[width=\textwidth]{../CFGP/Matern/error_bar_parity.pdf}
+        \caption{parity of \gls{CFGP}}\label{fig:error_bar_cfgp}
     \end{subfigure}
-    \caption{Calibration curves and parity plots of an overconfident \gls{NN} ensemble, an underconfident \gls{GP}, and better-calibrated \gls{dGP}.
+    \caption{Calibration curves and parity plots of an overconfident \gls{NN} ensemble, an underconfident \gls{GP}, and better-calibrated \gls{CFGP}.
     The vertical uncertainty bands in the parity plots indicate $\pm$2 standard deviations in the uncertainty predictions of each model.
     For clarity, we sampled only 20 points of the 8,289 test points to put in the parity plots.
     It follows that relatively overconfident models would have more points with uncertainty bands that do not cross the diagonal parity line;
@@ -372,8 +372,8 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{dGP}}\label{fig:parity_dgp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../PFGP/Matern/parity.pdf}
-        \caption{\gls{PFGP}}\label{fig:parity_pfgp}
+        \includegraphics[width=\textwidth]{../CFGP/Matern/parity.pdf}
+        \caption{\gls{CFGP}}\label{fig:parity_cfgp}
     \end{subfigure}
     \caption{Parity plots for all \gls{UQ} methods used in this study.
     Shading plots were used in lieu of scatter plots because the large number of test points (8,289) obfuscated patterns.
@@ -405,8 +405,8 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{dGP}}\label{fig:calibration_dgp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../PFGP/Matern/calibration.pdf}
-        \caption{\gls{PFGP}}\label{fig:calibration_pfgp}
+        \includegraphics[width=\textwidth]{../CFGP/Matern/calibration.pdf}
+        \caption{\gls{CFGP}}\label{fig:calibration_cfgp}
     \end{subfigure}
     \caption{Calibration curves for all \gls{UQ} methods used in this study.
     Dashed, blue lines indicate perfect calibration while solid orange lines indicate the experimental calibration of the test set.
@@ -437,8 +437,8 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{dGP}}\label{fig:sharpness_dgp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../PFGP/Matern/sharpness.pdf}
-        \caption{\gls{PFGP}}\label{fig:sharpness_pfgp}
+        \includegraphics[width=\textwidth]{../CFGP/Matern/sharpness.pdf}
+        \caption{\gls{CFGP}}\label{fig:sharpness_cfgp}
     \end{subfigure}
     \caption{Distribution plots of the \gls{ML}-predicted standard deviations for each method.
     Sharpness values are indicated by vertical lines.}\label{fig:sharpness}
@@ -456,7 +456,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \gls{dNN}           & 0.11          & 0.19      & 0.34          & 59            & 0.80      & 0.10      & 0.16  & 18.61 \\
         \gls{GP}            & 0.11          & 0.21      & 0.39          & 61            & 0.73      & 0.28      & 0.65  & 6.41 \\
         \gls{dGP}           & 0.11          & 0.19      & 0.33          & 59            & 0.81      & 0.05      & 0.21  & 6.09 \\
-        \gls{PFGP}          & 0.11          & 0.20      & 0.34          & 61            & 0.80      & 0.07      & 0.38  & 14.65 \\
+        \gls{CFGP}          & 0.11          & 0.19      & 0.33          & 59            & 0.80      & 0.06      & 0.24  & 2.80 \\
         \bottomrule
     \end{tabular}
     \caption{Performance metrics for all methods used in this study, which include:
@@ -473,33 +473,33 @@ The plain \gls{GP} has a higher \gls{RMSE} value than the rest of the methods th
 Thus our results suggest that our \gls{NN}-based methods are more accurate at outlier prediction than our sole non-\gls{NN}-based method.
 Each of our \gls{NN}-based methods may not have practically different accuracies between each other though.
 
-Regarding calibration:  The \gls{NN} ensemble and \gls{BNN} are overconfident; the \gls{GP} is underconfident; and the \gls{dNN}, \gls{dGP}, and \gls{PFGP} models are relatively calibrated.
+Regarding calibration:  The \gls{NN} ensemble and \gls{BNN} are overconfident; the \gls{GP} is underconfident; and the \gls{dNN}, \gls{dGP}, and \gls{CFGP} models are relatively calibrated.
 The three more calibrated methods all share a characteristic that the other methods do not:  They all start with a \gls{NN} that is dedicated for prediction alone, and then they end with some other in-series method to estimate uncertainty.
 Interestingly, this in-series method of learning predictions and then learning uncertainties is similar in spirit to how deep networks ``learn in stages'' at each subseqent hidden layer.
 
 Regarding sharpness:  The \gls{NN} ensemble and \gls{BNN} yield the sharpest uncertainties, although both do so at the cost of calibration.
-Among the three more calibrated models, the \gls{PFGP} yields the least sharp uncertainties (0.38 eV); \gls{dGP} yields a moderate sharpness (0.21 eV); and \gls{dNN} yields the lowest sharpness (0.16 eV).
+Among the three more calibrated models, the \gls{dNN} yields the lowest sharpness of 0.16 eV while the \gls{dGP} and \gls{CFGP} yield sharpnesses of 0.21 and 0.24 eV, respectively.
 Note how \gls{GP}-based \gls{UQ} methods tend to yield less sharp uncertainties than methods based purely on \gls{NN}s.
-This suggests that \gls{GP}s may yield more conservative \gls{UQ}s, for better or for worse.
+This suggests that \gls{GP}s may yield more conservative \gls{UQ}s.
 
-Regarding \gls{NLL}:  The \gls{dGP} and \gls{GP} methods yield the best (i.e., lowest) \gls{NLL} values.
-Note how the under-confident \gls{GP} model has a worse miscalibration area and sharpness than the \gls{dNN} and \gls{PFGP} models, but a better \gls{NLL} value.
+Regarding \gls{NLL}:  The \gls{CFGP} method yields the best (i.e., lowest) \gls{NLL} value of \textit{ca.} 2,800 while both the \gls{GP} and \gls{dGP} models yield relatively moderate \gls{NLL} values of \textit{ca.} 6,000.
+Note how the under-confident \gls{GP} model has a worse miscalibration area and sharpness than the \gls{dNN} but a better \gls{NLL} value.
 Simultaneously, the two most over-confident models (\gls{NN} ensemble and \gls{BNN}) yield the worst \gls{NLL} results.
 This shows that better \gls{NLL} values correlate with relatively conservative estimates of \gls{UQ}, but not with relatively liberal estimates.
 In other words:  If we use \gls{NLL} as our main performance metric, then we will favor under-confident \gls{UQ} estimates in lieu of over-confident estimates.
 
-Given the performance metrics for accuracy, calibration, sharpness, and \gls{NLL}, we expect the \gls{dGP} method to yield the best performing \gls{UQ} model for our dataset.
-It yields the lowest miscalibration area and \gls{NLL} while maintaining a relatively competitive accuracy and moderate sharpness.
+Given the performance metrics for accuracy, calibration, sharpness, and \gls{NLL}, we expect the \gls{CFGP} method to yield the best performing \gls{UQ} model for our dataset.
+It yields the best \gls{NLL} while maintaining a relatively competitive accuracy and calibration with a moderate sharpness.
 
 When choosing \gls{UQ} methods for different applications though, other factors should be considered.
-For example:  Although the \gls{dGP} method performed the best here, it required the use of a hand-crafted set of features.
+For example:  Although the \gls{dGP} method performed relatively well, it required the use of a hand-crafted set of features.
 If future researchers wish to use the \gls{dGP} method to predict other properties from atomic structures, they may have to define their own set of features.
 This process of feature engineering is non-trivial and varies from application to application.
-In some cases, it may be easier to use a \gls{UQ} method that does not require any additional features beyond the \gls{NN} input, such as \gls{dNN} or \gls{PFGP}.
+In some cases, it may be easier to use a \gls{UQ} method that does not require any additional features beyond the \gls{NN} input, such as \gls{dNN} or \gls{CFGP}.
 
 Another factor to consider is the overhead cost of implementation.
 For example:  The \gls{NN} ensemble method is arguably the simplest \gls{NN}-based \gls{UQ} method used here and may be the easiest or fastest method to implement.
-Conversely, \gls{NN} ensembles also have a higher computational training cost than some of the other methods used here, such as \gls{dNN} or \gls{PFGP}.
+Conversely, \gls{NN} ensembles also have a higher computational training cost than some of the other methods used here, such as \gls{dNN} or \gls{CFGP}.
 This high training cost is exacerbated if the ensemble is meant to be used in an active framework where the model needs to be trained continuously.
 As another example:  The \gls{BNN} method yielded perhaps the worst results of all the methods studied here.
 It could be argued that further optimization of the \gls{BNN} could have resulted in higher performance.
@@ -521,7 +521,7 @@ To assess all three aspects simultaneously, we suggest using the \glsentryfull{N
 The ensemble of all these metrics and figures can then be used to judge the relative performance of various UQ methods in a holistic fashion.
 
 As a case sutdy, we tested six different methods for predicting \glsentryfull{DFT} calculated adsorption energies with \gls{UQ}.
-The best performing method was an \glsentryfull{dGP}, which used a \gls{NN} to make adsorption energy predictions and then used a subsequent \gls{GP} to make uncertanity estimates.
+The best performing method was a \glsentryfull{CFGP}, which used a pre-trained convolutional output from a \gls{NN} as features for a subsequent \gls{GP} to make uncertanity estimates.
 Our studies also showed that the \gls{GP}-based methods we tested tended to yield higher and more conservative uncertainty estimates than the methods that used only \gls{NN}s and \gls{NN} derivatives.
 We also found that in-series methods tended to yield more calibrated models---i.e., methods that use one model to make value predictions and then a subsequent model to make uncertainty estimates were more calibrated than models that attempted to make value and uncertainty predictions simultaneously.
 These results are limited to our dataset though.
@@ -529,7 +529,7 @@ Results may vary for studies with different applications, different models, or d
 But the underpinning procedure we used to compare each of these models is still broadly applicable.
 
 Note that it would be possible to recalibrate\cite{Kuleshov2018} each of the models in this study to improve their uncertainty estimates.
-We purposefully ommitted recalibration in this study to (1) simplify the illustration of the assessment procedure; (2) assess the innate performance of each of these UQ methods without confounding with recalibration methods; and (3) reduce overhead investment.
+We purposefully ommitted recalibration in this study to (1) simplify the illustration of the \gls{UQ} assessment procedure; (2) assess the innate performance of each of these UQ methods without confounding with recalibration methods; and (3) reduce overhead investment.
 Future work should consider recalibration if the feasible UQ methods provide insufficiently calibrated uncertainty predictions
 
 
