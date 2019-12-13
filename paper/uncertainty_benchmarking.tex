@@ -61,7 +61,14 @@
 %\end{tocentry}
 
 \begin{abstract}
-    Abstract here.
+    Data science and informatics tools have been proliferating recently within the computational materials science and catalysis fields.
+    This proliferation has spurned the creation of various frameworks for automated materials screening, discovery, and design.
+    Underpinning all these frameworks are surrogate models with uncertainty estimates on their predictions.
+    These uncertainty estimates are instrumental for determining which materials to screen next, but there is not yet a standard procedure for judging the quality of such uncertainty estimates objectively.
+    Here we present a suite of figures and performance metrics that can be used to judge the quality of such uncertainty estimates.
+    This suite probes the accuracy, calibration, and sharpness of a model quantitatively.
+    We then show a case study where we judge various methods for predicting density-functional-theory-calculated adsorption energies.
+    Of the methods studied here, we find that the best performer is a model where a convolutional neural network is used to supply features to a Gaussian process regressor, which then makes predictions of adsorption energies along with corresponding uncertainty estimates.
 \end{abstract}
 
 
