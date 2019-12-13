@@ -37,7 +37,7 @@
 
 
 %%%%%%%%%%%%%%%%%%%% Title/Abstract %%%%%%%%%%%%%%%%%%%%
-\title{Uncertainty quantification in deep networks for material property predictions}
+\title{Methods for comparing uncertainty quantifications for material property predictions}
 \author{Kevin Tran}
 \affiliation{Chemical Engineering Department, Carnegie Mellon University, Pittsburgh, PA 15217}
 \altaffiliation{These authors contributed equally to this work}
@@ -80,17 +80,18 @@ Such active frameworks have already been used successfully in the field of catal
 For example: \citet{Peterson2016} has used a neural network to perform online active learning of \gls{NEB} calculations, reducing the number of force calls by an order of magnitude.
 \citet{Torres2018} have also used online active learning to accelerate \gls{NEB} calculations, but they used a \gls{GP} model instead of a neural network.
 \citet{Jinnouchi2019} have used online active learning to accelerate molecular dynamics simulations.
-Each of these active methods are underpinned by models with \gls{UQ}, which has garnered increasing attention itself.\cite{Peterson2017, Musil2019}
+Each of these active methods are underpinned by models with \gls{UQ}, which have garnered increasing attention themselves.\cite{Peterson2017, Musil2019}
 
 The goal of \gls{UQ} in predictive models is to quantify the relative likelihood of potential true outcomes associated with a predicted quantity, and to accurately assess the probabilities of these outcomes.
 For example, given an input for which we wish to make a prediction, a predictive \gls{UQ} method might return a confidence interval that aims to capture the true outcome a specified percentage of the time, or might return a probability distribution over possible outcomes.
 Performance metrics for predictive \gls{UQ} methods aim to assess how well a given quantification of the probabilities of potential true outcomes adheres to a set of observations of these outcomes.
 Some of the performance metrics for predictive \gls{UQ} are agnostic to prediction performance---they provide an assessment of the uncertainty independent of the predictive accuracy (i.e.\ a method can predict badly, but could still accurately quantify its own uncertainty).
 
-To our knowledge though, we have not seen many comparisons of different methods for \gls{UQ} within the field of catalysis and materials informatics.
-Here we attempt to resolve this issue by benchmarking different methods for \gls{UQ} (Figure~\ref{fig:overview}).
-We acknowledge that there will not be one optimal method across all use cases, but we still find value in sharing these results so that others can build intuition from our results.
-Perhaps more importantly, we have also establish a protocol for comparing the performance of different modeling and \gls{UQ} methods.
+To our knowledge though, we have seen few\cite{Janet2019} comparisons of different methods for \gls{UQ} within the field of catalysis and materials informatics.
+Here we attempt to establish a protocol for comparing the performance of different modeling and \gls{UQ} methods (Figure~\ref{fig:overview}).
+We then illustrate the protocol on a case study where we compare various models' abilities to predict \gls{DFT} calculated adsorption energies.
+We also offer anecdotal insights from our case study.
+We acknowledge that such insights may not be transferable to other applications, but we still find value in sharing these results so that others can build their own intuition from them.
 
 % TODO:  Kevin to make this figure
 \begin{figure}
@@ -134,7 +135,7 @@ Figure~\ref{fig:methods} illustrates all of the methods we investigate in this s
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{methods.pdf}
+    \includegraphics[width=0.8\textwidth]{methods/methods.pdf}
     \caption{Overview of the various \gls{UQ} methods we investigated in this study.
     $\Delta E$ represents \gls{DFT}-calculated adsorption energies;
     $\Delta \hat{E}$ represents \gls{ML}-predicted adsorption energies;
