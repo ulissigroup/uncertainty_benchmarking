@@ -34,6 +34,7 @@
 \newacronym{ML}{ML}{Machine Learning}
 \newacronym{eV}{eV}{electron volts}
 \newacronym{NLL}{NLL}{negative log-likelihood}
+\newacronym{BEEF}{BEEF-vdW}{Bayesian Error Estimation Functional with van der Waals correlation}
 
 
 %%%%%%%%%%%%%%%%%%%% Title/Abstract %%%%%%%%%%%%%%%%%%%%
@@ -542,6 +543,10 @@ But the underpinning procedure we used to compare each of these models is still 
 Note that it would be possible to recalibrate\cite{Kuleshov2018} each of the models in this study to improve their uncertainty estimates.
 We purposefully ommitted recalibration in this study to (1) simplify the illustration of the \gls{UQ} assessment procedure; (2) assess the innate performance of each of these UQ methods without confounding with recalibration methods; and (3) reduce overhead investment.
 Future work should consider recalibration if the feasible UQ methods provide insufficiently calibrated uncertainty predictions
+
+Future work may also consider uncertainty propagation from the underlying training data.
+For example:  If we used the \gls{BEEF},\cite{Wellendorff2012} then our \gls{DFT} calculated adsorption energies would have been distributions rather than than single point estimates.
+Such distributions could be propagated to certain \gls{UQ} surrogate models, e.g., as a variable-variance kernel in a \gls{GP}-type method.
 
 
 %%%%%%%%%%%%%%%%%%%% Misc %%%%%%%%%%%%%%%%%%%%
