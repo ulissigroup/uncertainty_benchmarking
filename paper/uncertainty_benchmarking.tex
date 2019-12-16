@@ -260,19 +260,29 @@ In other words:  Sharpness is akin to the average of the \gls{ML}-predicted stan
     sha = \sqrt{\frac{1}{N} \sum_{n=1}^{N} var(F_n)}
 \end{equation}
 
-Finally, we assess the performance of each predictive uncertainty method via a the \gls{NLL} on a held out set of data.
-This metric provides an overall assessment that is influenced by both the predictive accuracy of a method as well as the quality of its uncertainty quantification.
-Previous work~\cite{} has shown the \gls{NLL} to be a proper scoring rule, which intuitively means that it provides a fair quantitative assessment of the uncertainty quantification and that it can be decomposed into terms that relate to both calibration and sharpness.
-% TODO:  [Willie] Find a citation for this
-We include results for \gls{NLL} since it is a popular performance metric that has been used to quantify uncertainty in a variety of prior work~\cite{} and provides an additional single score for uncertainty quantification methods.
-% TODO:  [Willie] Find a citation for this
-Let $\ell_n$ denote the natural logarithm of the predictive probability density function at a given held-out point $n$.
-We then define \gls{NLL} using Equation~\ref{eq:nll}.
-In general, a lower \gls{NLL} value indicates a better fit.
+We also assessed the performance of each predictive uncertainty method by comparing their \gls{NLL} values on a held out set of data.
+For each test point, we established a Gaussian probability distribution using the mean and uncertainty predictions of each \gls{UQ} model.
+Then we calculated the conditional probability of observing the true value of the test point given the probability distribution created from the \gls{UQ}; this is the likelihood of one test point.
+We then calculated the product of all the likelihoods of all test points, which yielded the total test likelihood.
+It follows that better \gls{UQ} methods yield higher total likelihood values.
+Equivalently, we could calculate the natural logarithms of each likelihood, sum them, and then take the negative of this value; this is \gls{NLL}.
+Equation~\ref{eq:nll} shows how we calculated \gls{NLL}, where $y_i$ is the true value of a test point, $\hat{y}_i$ is a model's predicted mean value at that test point, $\hat{\sigma_i}^2$ is the model's predicted variance at that test point, and $N$ is the set of all test points.
 
 \begin{equation}\label{eq:nll}
-  NLL = - \sum_{n=1}^{N} \ell_n
+    NLL = - \sum_{i=1}^{N} \ln{P(y_i | N(\hat{y_i}, \hat{\sigma_i}^2))}
 \end{equation}
+
+\noindent Note how the \gls{NLL} value depends on the size and location of the test set.
+This means that the absolute value of \gls{NLL} changes from application to application, and so a ``good'' \gls{NLL} value must be contextualized within a particular test set.
+In general though, a lower \gls{NLL} value indicates a better fit.
+We also note that we assumed Gaussian distributions for our \gls{UQ} methods' predictions.
+This assumption does not necessarily need to be applied, meaning that the normal distribution in Equation~\ref{eq:nll} may be replaced with any other appropriate distribution.
+
+We use \gls{NLL} because it provides an overall assessment that is influenced by both the predictive accuracy of a method as well as the quality of its \gls{UQ}.
+Previous work~\cite{} has shown the \gls{NLL} to be a proper scoring rule, which intuitively means that it provides a quantitative assessment of the \gls{UQ} and that it can be decomposed into terms that relate to both calibration and sharpness.
+% TODO:  [Willie] Find a citation for this
+\gls{NLL} is also a popular performance metric that has been used to quantify uncertainty in a variety of prior work~\cite{} and provides an additional single score for \gls{UQ} methods.
+% TODO:  [Willie] Find a citation for this
 
 
 %%%%%%%%%%%%%%%%%%%% Results %%%%%%%%%%%%%%%%%%%%
