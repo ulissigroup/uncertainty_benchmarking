@@ -281,9 +281,16 @@ In general though, a lower \gls{NLL} value indicates a better fit.
 We also note that we assumed Gaussian distributions for our \gls{UQ} methods' predictions.
 This assumption does not necessarily need to be applied, meaning that the normal distribution in Equation~\ref{eq:nll} may be replaced with any other appropriate distribution.
 
-We use \gls{NLL} because it provides an overall assessment that is influenced by both the predictive accuracy of a method as well as the quality of its \gls{UQ}.
-Previous work~\cite{Dawid2014} has shown the \gls{NLL} to be a proper scoring rule, which intuitively means that it provides a quantitative assessment of the \gls{UQ} and that it can be decomposed into terms that relate to both calibration and sharpness.
-\gls{NLL} is also a popular performance metric that has been used to quantify uncertainty in a variety of prior work~\cite{Lakshminarayanan2017} and provides an additional single score for \gls{UQ} methods.
+We use \gls{NLL} because it provides an overall assessment that is influenced
+by both the predictive accuracy of a method as well as the quality of its
+\gls{UQ}.  Previous work~\cite{gneiting2007strictly, Dawid2014} has shown the
+\gls{NLL} to be a strictly proper scoring rule, which intuitively means that it
+provides a fair quantitative assessment (or score) for the performance of the
+\gls{UQ} method, and that it can be decomposed into terms that relate to both
+calibration and sharpness.  \gls{NLL} is also a popular performance metric that
+has been used to quantify uncertainty in a variety of prior
+work~\cite{Lakshminarayanan2017} and provides an additional single score for
+\gls{UQ} methods.
 
 
 %%%%%%%%%%%%%%%%%%%% Results %%%%%%%%%%%%%%%%%%%%
