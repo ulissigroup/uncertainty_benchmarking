@@ -165,9 +165,12 @@ In this case, we predict \gls{DFT}-calculated adsorption energies, $\Delta$E.
 Reference \citet{Back2019} for additional details.
 
 \textbf{\glsentrytext{NN} Ensemble:}
-We created an ensemble of \gls{NN}s by K-fold subsampling the training data into five different folds and then training individual \gls{NN} models on each of these folds.
-Thus the mean of each of these models' predictions is the final prediction of the ensemble, and the standard deviation of the individual predictions is the ensemble's estimate of uncertainty.
-% TODO:  Willie to provide justification for subsampling method. And maybe a reference for K-folding?
+We created an ensemble of \gls{NN}s by K-fold subsampling the training data
+into five different folds and then training individual \gls{NN} models on the K
+sets of K-1 folds, where we used a unique random initialization for each model.
+For the final prediction of the ensemble we computed the mean of the set of
+models' predictions, and for the ensemble's estimate of uncertainty we computed
+the standard deviation of the set of predictions.
 
 \textbf{\glsentrytext{BNN}:}
 The aim of \gls{BNN} is to determine the posterior distribution of model parameters rather than a single optimal value of the parameters.
