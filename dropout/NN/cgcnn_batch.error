@@ -1,0 +1,57 @@
+Traceback (most recent call last):
+  File "d_cgcnn.py", line 121, in <module>
+    
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/site-packages/skorch/net.py", line 1550, in load_params
+    self.history = History.from_file(f_history)
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/site-packages/skorch/history.py", line 162, in from_file
+    with open_file_like(f, 'r') as fp:
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/contextlib.py", line 81, in __enter__
+    return next(self.gen)
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/site-packages/skorch/utils.py", line 399, in open_file_like
+    f = open(f, mode)
+FileNotFoundError: [Errno 2] No such file or directory: './histories/valid_best_d5_history.json'
+Traceback (most recent call last):
+  File "d_cgcnn.py", line 121, in <module>
+    
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/site-packages/skorch/net.py", line 1550, in load_params
+    self.history = History.from_file(f_history)
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/site-packages/skorch/history.py", line 162, in from_file
+    with open_file_like(f, 'r') as fp:
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/contextlib.py", line 81, in __enter__
+    return next(self.gen)
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/site-packages/skorch/utils.py", line 399, in open_file_like
+    f = open(f, mode)
+FileNotFoundError: [Errno 2] No such file or directory: './histories/valid_best_d20_history.json'
+Traceback (most recent call last):
+  File "d_cgcnn.py", line 121, in <module>
+    
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/site-packages/skorch/net.py", line 1550, in load_params
+    self.history = History.from_file(f_history)
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/site-packages/skorch/history.py", line 162, in from_file
+    with open_file_like(f, 'r') as fp:
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/contextlib.py", line 81, in __enter__
+    return next(self.gen)
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/site-packages/skorch/utils.py", line 399, in open_file_like
+    f = open(f, mode)
+FileNotFoundError: [Errno 2] No such file or directory: './histories/valid_best_d15_history.json'
+Traceback (most recent call last):
+  File "d_cgcnn.py", line 121, in <module>
+    
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/site-packages/skorch/net.py", line 1550, in load_params
+    self.history = History.from_file(f_history)
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/site-packages/skorch/history.py", line 162, in from_file
+    with open_file_like(f, 'r') as fp:
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/contextlib.py", line 81, in __enter__
+    return next(self.gen)
+  File "/global/homes/k/ktran/miniconda3/envs/gaspy/lib/python3.6/site-packages/skorch/utils.py", line 399, in open_file_like
+    f = open(f, mode)
+FileNotFoundError: [Errno 2] No such file or directory: './histories/valid_best_d10_history.json'
+srun: error: cgpu09: task 0: Exited with exit code 1
+srun: Terminating job step 363055.2
+srun: error: cgpu09: task 0: Exited with exit code 1
+srun: Terminating job step 363055.3
+slurmstepd: error: *** JOB 363055 ON cgpu08 CANCELLED AT 2019-12-18T14:49:38 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 363055.0 ON cgpu08 CANCELLED AT 2019-12-18T14:49:38 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 363055.1 ON cgpu08 CANCELLED AT 2019-12-18T14:49:38 DUE TO TIME LIMIT ***
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
