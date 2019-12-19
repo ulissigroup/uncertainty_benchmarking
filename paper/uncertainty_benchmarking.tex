@@ -165,12 +165,8 @@ In this case, we predict \gls{DFT}-calculated adsorption energies, $\Delta$E.
 Reference \citet{Back2019} for additional details.
 
 \textbf{\glsentrytext{NN} Ensemble:}
-We created an ensemble of \gls{NN}s by K-fold subsampling the training data
-into five different folds and then training individual \gls{NN} models on the K
-sets of K-1 folds, where we used a unique random initialization for each model.
-For the final prediction of the ensemble we computed the mean of the set of
-models' predictions, and for the ensemble's estimate of uncertainty we computed
-the standard deviation of the set of predictions.
+We created an ensemble of \gls{NN}s by K-fold subsampling the training data into five different folds and then training individual \gls{NN} models on the K sets of K-1 folds, where we used a unique random initialization for each model.
+For the final prediction of the ensemble we computed the mean of the set of models' predictions, and for the ensemble's estimate of uncertainty we computed the standard deviation of the set of predictions.
 
 \textbf{\glsentrytext{BNN}:}
 The aim of \gls{BNN} is to determine the posterior distribution of model parameters rather than a single optimal value of the parameters.
@@ -281,16 +277,9 @@ In general though, a lower \gls{NLL} value indicates a better fit.
 We also note that we assumed Gaussian distributions for our \gls{UQ} methods' predictions.
 This assumption does not necessarily need to be applied, meaning that the normal distribution in Equation~\ref{eq:nll} may be replaced with any other appropriate distribution.
 
-We use \gls{NLL} because it provides an overall assessment that is influenced
-by both the predictive accuracy of a method as well as the quality of its
-\gls{UQ}.  Previous work~\cite{gneiting2007strictly, Dawid2014} has shown the
-\gls{NLL} to be a strictly proper scoring rule, which intuitively means that it
-provides a fair quantitative assessment (or score) for the performance of the
-\gls{UQ} method, and that it can be decomposed into terms that relate to both
-calibration and sharpness.  \gls{NLL} is also a popular performance metric that
-has been used to quantify uncertainty in a variety of prior
-work~\cite{Lakshminarayanan2017} and provides an additional single score for
-\gls{UQ} methods.
+We use \gls{NLL} because it provides an overall assessment that is influenced by both the predictive accuracy of a method as well as the quality of its \gls{UQ}.
+Previous work~\cite{Gneiting2007, Dawid2014} has shown the \gls{NLL} to be a strictly proper scoring rule, which intuitively means that it provides a fair quantitative assessment (or score) for the performance of the \gls{UQ} method, and that it can be decomposed into terms that relate to both calibration and sharpness.
+\gls{NLL} is also a popular performance metric that has been used to quantify uncertainty in a variety of prior work~\cite{Lakshminarayanan2017} and provides an additional single score for \gls{UQ} methods.
 
 
 %%%%%%%%%%%%%%%%%%%% Results %%%%%%%%%%%%%%%%%%%%
