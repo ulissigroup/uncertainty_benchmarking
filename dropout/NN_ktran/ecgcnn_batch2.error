@@ -1,7 +1,0 @@
-srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
-srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
-slurmstepd: error: *** STEP 354761.2 ON cgpu03 CANCELLED AT 2019-12-08T17:37:45 DUE TO TIME LIMIT ***
-slurmstepd: error: *** STEP 354761.0 ON cgpu02 CANCELLED AT 2019-12-08T17:37:45 DUE TO TIME LIMIT ***
-srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
-slurmstepd: error: *** JOB 354761 ON cgpu02 CANCELLED AT 2019-12-08T17:37:45 DUE TO TIME LIMIT ***
-slurmstepd: error: *** STEP 354761.1 ON cgpu02 CANCELLED AT 2019-12-08T17:37:45 DUE TO TIME LIMIT ***
