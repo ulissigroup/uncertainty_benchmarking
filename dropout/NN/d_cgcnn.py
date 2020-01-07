@@ -83,8 +83,8 @@ net = NeuralNetRegressor(
     device=device,
     criterion=torch.nn.L1Loss,
     dataset=MergeDataset,
-    dropout_bool_=dropout_bool,
-    dropout_weight_=dropout,
+    module__dropout_bool_=dropout_bool,
+    module__dropout_weight_=dropout,
     callbacks=[cp, load_best_valid_loss, LR_schedule]
 )
 
@@ -92,9 +92,9 @@ net = NeuralNetRegressor(
 # # Training
 
 # We can train a new model...
-f_history   = './histories/valid_best_d%i_history.json' % dropout_percent
-f_optimizer = './histories/valid_best_d%i_optimizer.pt' % dropout_percent
-f_params    = './histories/valid_best_d%i_params.pt' % dropout_percent
+f_history   = './histories/d%i_valid_best_history.json' % dropout_percent
+f_optimizer = './histories/d%i_valid_best_optimizer.pt' % dropout_percent
+f_params    = './histories/d%i_valid_best_params.pt' % dropout_percent
 
 """
 # We can save time by using previously cached parameters
@@ -123,10 +123,10 @@ net.load_params(f_history=f_history,
 from tqdm import tqdm_notebook
 
 # Calculate the error metrics
-predy = np.array([net.predict(sdts_test) for _ in tqdm_notebook(range(100))])
-ymean = predy.mean(axis=1)
-standard_errors = predy.std(axis=1)
-residuals = ymean - targets_test.reshape(-1)
+predy_test = np.array([net.predict(sdts_test) for _ in tqdm_notebook(range(100))])
+ymean = predy_test.mean(axis=0).reshape(-1)
+residuals = targets_pred - targets_val.reshape(-1)
+standard_errors = predy_test.std(axis=0).reshape(-1)
 
 
 # Calculate scalar metrics
@@ -145,4 +145,4 @@ corr  = np.corrcoef(targets_test.reshape(-1), ymean)[0, 1]
 
 # Save as pickle to be plotted with in the same graph as others
 with open('histories/single_cgcnn_d%i.pkl' % dropout_percent, 'wb') as saveplot:
-    pickle.dump((predy, targets_test, mae, rmse, r2, mdae, marpd, corr), saveplot)
+    pickle.dump((predy_test, targets_test, mae, rmse, r2, mdae, marpd, corr), saveplot)
