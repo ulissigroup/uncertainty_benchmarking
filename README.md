@@ -1,5 +1,5 @@
 This reposity houses various experiments where we perform ML regressions using various methods.
-Our goal is to down-select the ML methods that give us the best prediction accuracy, [uncertainty calibration, and uncertainty sharpness](https://arxiv.org/abs/1807.00263).
+Our goal is to down-select the ML methods that give us the best prediction accuracy, [uncertainty calibration, uncertainty sharpness](https://arxiv.org/abs/1807.00263), and score by a [proper scoring rule](https://www.stat.washington.edu/raftery/Research/PDF/Gneiting2007jasa.pdf).
 
 # Content
 
