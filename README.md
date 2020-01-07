@@ -27,6 +27,10 @@ Thus `sdt`s in this repository reference this type of feature.
 # Written report
 
 The [written report](./paper/uncertainty_benchmarking.pdf) of our findings can be found in the paper folder, along with all of the files needed to compile the report.
+Additionally, the report can be found on arXiv:
+> [Methods for comparing uncertainty quantifications for material property predictions](https://arxiv.org/abs/1912.10066)\
+> Kevin Tran, Willie Neiswanger, Junwoong Yoon, Eric Xing, Zachary W. Ulissi.\
+> _arXiv:1912.10066_.
 
 
 # Dependencies
