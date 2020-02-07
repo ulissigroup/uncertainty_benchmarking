@@ -30,7 +30,7 @@
 \newacronym{MLE}{MLE}{Maximum Likelihood Estimation}
 \newacronym{CFGP}{CFGP}{Convolution-Fed Gaussian Process}
 \newacronym{dNN}{NN$\Delta$NN}{in-series NNs}
-\newacronym{dGP}{NN$\Delta$GP}{in-series NN \& GP}
+\newacronym{dGP}{GP$_{NN-\mu}$}{GP with NN mean}
 \newacronym{ML}{ML}{Machine Learning}
 \newacronym{eV}{eV}{electron volts}
 \newacronym{NLL}{NLL}{negative log-likelihood}
@@ -55,18 +55,13 @@
 
 \begin{document}
 
-%\setlength{\fboxrule}{0 pt}
-%\begin{tocentry}
-%    \includegraphics[width=\textwidth]{TOC/TOC.pdf}
-%    TOC caption here.
-%\end{tocentry}
 
 \begin{abstract}
     Data science and informatics tools have been proliferating recently within the computational materials science and catalysis fields.
     This proliferation has spurned the creation of various frameworks for automated materials screening, discovery, and design.
-    Underpinning all these frameworks are surrogate models with uncertainty estimates on their predictions.
-    These uncertainty estimates are instrumental for determining which materials to screen next, but there is not yet a standard procedure for judging the quality of such uncertainty estimates objectively.
-    Here we present a suite of figures and performance metrics that can be used to judge the quality of such uncertainty estimates.
+    Underpinning these frameworks are surrogate models with uncertainty estimates on their predictions.
+    These uncertainty estimates are instrumental for determining which materials to screen next, but the computational catalysis field does not yet have a standard procedure for judging the quality of such uncertainty estimates.
+    Here we present a suite of figures and performance metrics derived from the machine learning community that can be used to judge the quality of such uncertainty estimates.
     This suite probes the accuracy, calibration, and sharpness of a model quantitatively.
     We then show a case study where we judge various methods for predicting density-functional-theory-calculated adsorption energies.
     Of the methods studied here, we find that the best performer is a model where a convolutional neural network is used to supply features to a Gaussian process regressor, which then makes predictions of adsorption energies along with corresponding uncertainty estimates.
@@ -80,7 +75,7 @@
 The fields of catalysis and materials science are burgeoning with methods to screen, design, and understand materials.\cite{Medford2018, Gu2019, Schleder2019, Alberi2019}
 This research has spurned the creation of \gls{ML} models to predict various material properties.
 Unfortunately, the design spaces for these models are sometimes too large and intractable to sample completely.
-These undersampling issues can limit the training data and therefore the predictive power of the models.
+These under-sampling issues can limit the training data and therefore the predictive power of the models.
 It would be helpful to have an \gls{UQ} for a model so that we know when to trust the predictions and when not to.
 More specifically:  \gls{UQ} would enable various online, active frameworks for materials discovery and design (e.g., active learning,\cite{Settles2012} online active learning,\cite{Chu2011} Bayesian optimization,\cite{Frazier2018} active search,\cite{Garnett2012} or goal oriented design of experiments\cite{Kandasamy}).
 
@@ -88,27 +83,27 @@ Such active frameworks have already been used successfully in the field of catal
 For example: \citet{Peterson2016} has used a neural network to perform online active learning of \gls{NEB} calculations, reducing the number of force calls by an order of magnitude.
 \citet{Torres2018} have also used online active learning to accelerate \gls{NEB} calculations, but they used a \gls{GP} model instead of a neural network.
 \citet{Jinnouchi2019} have used online active learning to accelerate molecular dynamics simulations.
-Each of these active methods are underpinned by models with \gls{UQ}, which have garnered increasing attention themselves.\cite{Peterson2017, Musil2019}
+These methods are all underpinned by models with \gls{UQ}, which have garnered increasing attention.\cite{Peterson2017, Musil2019}
 
-The goal of \gls{UQ} in predictive models is to quantify the relative likelihood of potential true outcomes associated with a predicted quantity, and to accurately assess the probabilities of these outcomes.
-For example, given an input for which we wish to make a prediction, a predictive \gls{UQ} method might return a confidence interval that aims to capture the true outcome a specified percentage of the time, or might return a probability distribution over possible outcomes.
+The goal of \gls{UQ} is to quantify accurately the likelihood of outcomes associated with a predicted quantity.
+For example, given an input for which we wish to make a prediction, a predictive \gls{UQ} method might return a confidence interval that aims to capture the true outcome a specified percentage of the time or might return a probability distribution over possible outcomes.
 Performance metrics for predictive \gls{UQ} methods aim to assess how well a given quantification of the probabilities of potential true outcomes adheres to a set of observations of these outcomes.
 Some of the performance metrics for predictive \gls{UQ} are agnostic to prediction performance---they provide an assessment of the uncertainty independent of the predictive accuracy (i.e.\ a method can predict badly, but could still accurately quantify its own uncertainty).
 
-To our knowledge though, we have seen few\cite{Janet2019} comparisons of different methods for \gls{UQ} within the field of catalysis and materials informatics.
-Here we attempt to establish a protocol for comparing the performance of different modeling and \gls{UQ} methods (Figure~\ref{fig:overview}).
+We have seen few\cite{Janet2019} comparisons of different methods for \gls{UQ} within the field of catalysis and materials informatics.
+Here we examine a protocol\cite{Kuleshov2018} for comparing the performance of different modeling and \gls{UQ} methods (Figure~\ref{fig:overview}).
 We then illustrate the protocol on a case study where we compare various models' abilities to predict \gls{DFT} calculated adsorption energies.
 We also offer anecdotal insights from our case study.
-We acknowledge that such insights may not be transferable to other applications, but we still find value in sharing these results so that others can build their own intuition from them.
+We acknowledge that such insights may not be transferable to other applications, but we find value in sharing them so that others can build their own intuition.
 
 \begin{figure}
     \centering
     \includegraphics[width=0.75\textwidth]{intro/intro.pdf}
-    \caption{Overview of proposed procedure for judging the quality of models with uncerainty estimates.
+    \caption{Overview of proposed procedure for judging the quality of models with uncertainty estimates.
     First and foremost, the models should be accurate.
     Second, the models should be ``calibrated'', which means that their uncertainty estimates should be comparable with their residuals.
     Third, the models should be ``sharp'', which means that their uncertainty estimates should be narrow.
-    This study will show how to visualize and quantify all three of these characteristics so that different methods of \gls{UQ} can be compared objectively.}\label{fig:overview}
+    This study demonstrates how to visualize and quantify these characteristics so that different methods of \gls{UQ} can be compared objectively.}\label{fig:overview}
 \end{figure}
 
 
@@ -116,7 +111,7 @@ We acknowledge that such insights may not be transferable to other applications,
 
 \section{Methods}
 
-\subsection{Data handling}
+\subsection{Dataset information}
 
 All regressions in this paper were performed on a dataset of \gls{DFT} calculated adsorption energies created with \gls{GASpy}\cite{Tran2018, Tran2018a}.
 These data included energies from 21,269 different H adsorption sites; 1,594 N sites; 18,437 CO sites; 2,515 O sites; and 3,464 OH sites; totaling in 47,279 data points.
@@ -132,16 +127,16 @@ To split the data into train/validate/test sets, we enumerated all adsorption en
 We did this because some of the regression methods in this paper use a featurization that contains our monometallic adsorption energy data\cite{Tran2018}, and so having the monometallic adsorption energies pre-allocated in the training set prevented any information leakage between the training set and validation/test sets.
 After this allocation, we performed a 64/14/20 train/validate/test split that was stratified\cite{Thompson2012} by adsorbate.
 We then used the validation set's results to tune various hyperparameters manually.
-After tuning, we calculated the training set results and present them in this paper exclusively.
+After tuning, we calculated the test set results and present them in this paper exclusively.
 Note that the test results were obtained using models that were trained only using the training set, not the validation set.
 This is acceptable because we only seek to compare methods here, not to optimize them.
 
 
 \subsection{Regression methods}
 
-We explore a number of predictive \gls{UQ} methods that aim to quantify the uncertainty for regression procedures, where the predicted quantity is a continuous variable.
-In order to standardize the assessment of performance, we ensure that each \gls{UQ} method returns predictive uncertainty results in a consistent format:  a distribution over possible outcomes of the predicted quantity for any specified input point.
-This result format allows us to compute all of the predictive uncertainty performance metrics which we will introduce in subsequent sections.
+We explore various methods that aim to quantify the uncertainty for regression procedures where the predicted quantity is a continuous variable.
+To standardize the assessment of performance, we ensure that each \gls{UQ} method returns predictive uncertainty results in a consistent format:  a distribution over possible outcomes of the predicted quantity for any specified input point.
+This result format allows us to compute all the predictive uncertainty performance metrics which we introduce in subsequent sections.
 Figure~\ref{fig:methods} illustrates all of the methods we investigate in this study, and we describe each method in detail below.
 
 \begin{figure}
@@ -165,7 +160,9 @@ In this case, we predict \gls{DFT}-calculated adsorption energies, $\Delta$E.
 Reference \citet{Back2019} for additional details.
 
 \textbf{\glsentrytext{NN} Ensemble:}
-We created an ensemble of \gls{NN}s by K-fold subsampling the training data into five different folds and then training individual \gls{NN} models on the K sets of K-1 folds, where we used a unique random initialization for each model.
+We created an ensemble of \gls{NN}s by 5-fold subsampling the training data and then training individual \gls{NN} models on the 5 folds.
+Each individual \gls{NN} model's architecture is identical to the base \gls{NN} architecture outlined previously.
+The only differences are their training sets and their individually randomized initial weights.
 For the final prediction of the ensemble we computed the mean of the set of models' predictions, and for the ensemble's estimate of uncertainty we computed the standard deviation of the set of predictions.
 
 \textbf{\glsentrytext{BNN}:}
@@ -184,6 +181,7 @@ When training the first \gls{NN}, we hold out 10\% of the training data.
 Afterwards, we use the residuals of the initial \gls{NN} on the held-out portion as training data for the second \gls{NN}.
 After the secondary training, this second \gls{NN} can predict residuals for the first \gls{NN} on some new set of input data.
 The predictions of the second \gls{NN} can then be used as uncertainty estimates.
+Note that both the \gls{NN}s included within the \gls{dNN} were constructed using the same convolutional architecture outlined previously.
 
 \textbf{\glsentrytext{GP}:}
 \gls{GP}s are one of the most common regression methods for producing \gls{UQ}s, and so we use them here as a baseline.
@@ -203,17 +201,18 @@ Typically, in lieu of any additional prior knowledge, practitioners will take th
 However, we could instead supply an alternative curve for the prior mean, and then perform the usual Bayesian updates to compute the posterior of this \gls{GP} given observations. 
 Here, for the \gls{GP} prior mean, we supply the prediction given by a single pre-trained \gls{NN}. 
 We call this method \gls{dGP}.
-For the \gls{GP}, we used a Matern covariance kernel, where we fit the kernel hyperparameters using \gls{MLE}. 
+For the input features of this \gls{GP}, we used the same exact features we used for the plain \gls{GP}---i.e., the vector of atomic numbers, electronegativity, etc.\
+For the covariance kernel of this \gls{GP}, we used a Matern kernel where we fit the kernel hyperparameters using \gls{MLE}. 
 All \gls{GP} training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
 
 \textbf{\glsentrytext{CFGP}:}
 A limitation of using this formulation of a \gls{GP} with \gls{NN}-predicted mean is that it requires the use of hand-crafted features for the \gls{GP}.
 This requirement reduces the transferability of the method to other applications where such features may not be readily available.
-To address this, we formulated a different method whereby we first train a neural network on the learning task (i.e., predict adsorption energies), and then we use the pooled outputs of the convolutional layers of the network as features in a new \gls{GP}.
+To address this, we formulated a different method where we first train a \gls{NN} (as described previously) to predict adsorption energies and then fix the network's weights.
+Then we use the 46 pooled outputs of the convolutional layers of the network as features in a new \gls{GP}.
 The \gls{GP} would then be trained to use these features to produce both mean and uncertainty predictions on the adsorption energies.
 We call this a \gls{CFGP}.
-In this case, we used the baseline \gls{NN} as the network from which we obtained the convolution outputs.
-We also normalized the convolution outputs of the \gls{NN} so that each output would have a mean of zero and a standard deviation of one.
+Note that we normalized the 46 convolution outputs of the \gls{NN} so that each output would have a mean of zero and a standard deviation of one across the training set.
 To define the \gls{GP}, we assumed a constant mean and used a Matern covariance kernel.
 We trained the length scale of the Matern kernel using the \gls{MLE} method.
 All \gls{GP} training and predictions were done with GPU acceleration as implemented in GPyTorch.\cite{Gardner2018}.
@@ -221,7 +220,7 @@ All \gls{GP} training and predictions were done with GPU acceleration as impleme
 
 \subsection{Performance metrics}
 
-We used six different metrics to quantify the accuracy of the various models:  \gls{MDAE}, \gls{RMSE}, \gls{MAE}, \gls{MARPD}, and \gls{R2}.
+We used five different metrics to quantify the accuracy of the various models:  \gls{MDAE}, \gls{RMSE}, \gls{MAE}, \gls{MARPD}, and \gls{R2}.
 We used \gls{MDAE} because is insensitive to outliers and is therefore a good measure of accuracy for the majority of the data.
 We used \gls{RMSE} because it is sensitive to outliers and is therefore a good measure of worst-case accuracy.
 We used \gls{MAE} because it lies between \gls{MDAE} and \gls{RMSE} in terms of sensitivity to outliers.
@@ -234,14 +233,14 @@ The ensemble of these metrics provide a more robust view of accuracy than any on
     MARPD = \frac{1}{N} \sum_{n=1}^{N} \abs{100 \cdot \frac{\hat{x}_n - x_n}{\abs{\hat{x}_n} + \abs{x_n}}}
 \end{equation}
 
-To assess the calibration (or ``honesty'') of these models' UQs, we created calibration curves. A calibration curve ``displays the true frequency of points in each [prediction] interval relative to the predicted fraction of points in that interval'', as outlined by \citet{Kuleshov2018}.
-In other words:  We used the standard deviation predictions to create Gaussian-shaped prediction intervals around each test point, and then we compared these intervals to the models' residuals at these points.
-If the residuals tended to fall outside the prediction intervals too often, then the UQs were considered overconfident.
-If the residuals tended to fall inside the prediction intervals too often, then the UQs were considered underconfident.
-Thus ``well-calibrated'' models had residuals that created a Gaussian distribution whose standard deviation was close to the model's predicted standard deviations.
+To assess the calibration (or ``honesty'') of these models' UQs, we created calibration curves.
+A calibration curve ``displays the true frequency of points in each interval relative to the predicted fraction of points in that interval'', as outlined by \citet{Kuleshov2018}.
+In other words:  We used the standard deviation predictions to create Gaussian random variables for each test point and then tested how well the residuals followed their respective Gaussian random variables.
+Thus ``well-calibrated'' models had residuals that created Gaussian distributions whose standard deviations were close to the model's predicted standard deviations.
 We discuss calibration curves in more detail in the Results section alongside specific examples.
+We also calculated the calibration errors\cite{Kuleshov2018} of our models, which is a quantitative measure of calibration.
 
-As \citet{Kuleshov2018} also pointed out, well-calibrated models are necessary but not sufficient for useful UQs.
+As \citet{Kuleshov2018} also pointed out, well-calibrated models are necessary but not sufficient for useful \gls{UQ}s.
 For example:  A well-calibrated model could still have large uncertainty estimates, which are inherently less useful than well-calibrated and small uncertainty estimates.
 This idea of having small uncertainty estimates is called ``sharpness'', and \citet{Kuleshov2018} define it with Equation~\ref{eq:og_sharpness}
 
@@ -249,7 +248,7 @@ This idea of having small uncertainty estimates is called ``sharpness'', and \ci
     sha = \frac{1}{N} \sum_{n=1}^{N} var(F_n)
 \end{equation}
 
-\noindent where $var(F_n)$ is the variance of the cumulative distribution function $F$ at point $n$.
+\noindent where $var(F_n)$ is the variance of the random variable whose cumulative distribution function is $F$ at point $n$.
 This is akin to the average variance of the uncertainty estimates on the test set.
 Here we propose and use a new formulation (Equation~\ref{eq:sharpness}) where we add a square root operation.
 This operation gives the sharpness the same units as the predictions, which provides us with a more intuitive reference.
@@ -259,21 +258,21 @@ In other words:  Sharpness is akin to the average of the \gls{ML}-predicted stan
     sha = \sqrt{\frac{1}{N} \sum_{n=1}^{N} var(F_n)}
 \end{equation}
 
-We also assessed the performance of each predictive uncertainty method by comparing their \gls{NLL} values on a held out set of data.
+We also assessed the performance of each predictive uncertainty method by comparing their \gls{NLL} values the test set.
 For each test point, we established a Gaussian probability distribution using the mean and uncertainty predictions of each \gls{UQ} model.
 Then we calculated the conditional probability of observing the true value of the test point given the probability distribution created from the \gls{UQ}; this is the likelihood of one test point.
 We then calculated the product of all the likelihoods of all test points, which yielded the total test likelihood.
 It follows that better \gls{UQ} methods yield higher total likelihood values.
 Equivalently, we could calculate the natural logarithms of each likelihood, sum them, and then take the negative of this value; this is \gls{NLL}.
-Equation~\ref{eq:nll} shows how we calculated \gls{NLL}, where $y_i$ is the true value of a test point, $\hat{y}_i$ is a model's predicted mean value at that test point, $\hat{\sigma_i}^2$ is the model's predicted variance at that test point, and $N$ is the set of all test points.
+Equation~\ref{eq:nll} shows how we calculated \gls{NLL}, where $y_i$ is the true value of a test point, $\hat{y}_i$ is a model's predicted mean value at that test point, $\hat{\sigma_i}^2$ is the model's predicted variance at that test point, $n$ is the set of all test points, and $N(x, y)$ is a normal distribution with mean $x$ and variance $y$.
 
 \begin{equation}\label{eq:nll}
-    NLL = - \sum_{i=1}^{N} \ln{P(y_i | N(\hat{y_i}, \hat{\sigma_i}^2))}
+    NLL = - \sum_{i=1}^{n} \ln{P(y_i | N(\hat{y_i}, \hat{\sigma_i}^2))}
 \end{equation}
 
 \noindent Note how the \gls{NLL} value depends on the size and location of the test set.
 This means that the absolute value of \gls{NLL} changes from application to application, and so a ``good'' \gls{NLL} value must be contextualized within a particular test set.
-In general though, a lower \gls{NLL} value indicates a better fit.
+Within a test set, a lower \gls{NLL} value indicates a better fit.
 We also note that we assumed Gaussian distributions for our \gls{UQ} methods' predictions.
 This assumption does not necessarily need to be applied, meaning that the normal distribution in Equation~\ref{eq:nll} may be replaced with any other appropriate distribution.
 
@@ -290,9 +289,9 @@ Previous work~\cite{Gneiting2007, Dawid2014} has shown the \gls{NLL} to be a str
 
 Let us first discuss the results of our \gls{NN} ensemble for illustrative purposes.
 Figure~\ref{fig:results_example} contains a parity plot, calibration curve, and predicted-uncertainty distribution of our \gls{NN} ensemble model.
-The parity plot shows the accuracy of the model; the calibration curve shows the honesty of the model's uncertainty predictions; and the uncertainty distribution shows the sharpness of model's uncertainty predictions.
+The parity plot shows the accuracy of the model; the calibration curve shows the honesty of the model's uncertainty predictions; and the uncertainty distribution shows the sharpness of the model's uncertainty predictions.
 Accurate models have parity plots whose points tend to fall near the diagonal parity line.
-Calibrated models have calibration curves that approach the ideal diganoal line.
+Calibrated models have calibration curves that approach the ideal diagonal line.
 Sharp models have uncertainty distributions that tend towards zero.
 Note that sharpness should not be won at the cost of calibration.
 
@@ -313,20 +312,24 @@ Note that sharpness should not be won at the cost of calibration.
     \caption{Results of the \gls{NN} ensemble. Each figure here was created with the test set of 8,289 points.}\label{fig:results_example}
 \end{figure}
 
-The calibration curve was created by first normalizing all test residuals by their respective uncertainty values, i.e.\ we divided the residuals by their predicted standard deviations.
-If we assume that the normalized residuals follow a Gaussian distribution, then 68\% of the normalized residuals would fall between [-1, 1], 95\% of them would fall between [-2, 2], 99\% of them would fall between [-3, 3], etc.
-To challenge this assumption, we plotted the actual fraction of points within each prediction interval against the expected fraction of points.
-This plot is a calibration curve.
-Thus a perfectly calibrated model would have normalized residuals that are perfectly Gaussian, which would yield a diagonal calibration line.
+The calibration curve was created by first establishing Gaussian random variables for each test point where the means were the model's predictions and the variances were the model's predicted variances.
+The test residuals could then be compared against their respective random variables.
+For simplification purposes, we divided each of the test residuals by their corresponding standard deviations so that we could test all residuals against the same unit Gaussian distribution.
+Thus if the normalized test residuals followed a unit Gaussian distribution, then the model's uncertainty predictions could be considered well-calibrated.
+We tested this by calculating the theoretical cumulative distribution of points within the intervals $(-\infty, x] \mkern9mu \forall \mkern9mu x \in (-\infty, \infty)$ and then compared it against the observed cumulative distributions.  % chktex 9
+A plot of the observed cumulative distributions against the theoretical cumulative distributions is called a calibration curve.
+A perfectly calibrated model would have normalized residuals that are Gaussian, which would yield a diagonal calibration line.
 Therefore, models' calibration could be qualified by the closeness of their calibration curves to this ideal, diagonal curve.
 We quantified this closeness by calculating the area between the calibration curve and the ideal diagonal.
 We call this the miscalibration area, and smaller values indicate better calibration.
+We also calculated the calibration error,\cite{Kuleshov2018} which is the mean square difference between the expected cumulative distributions and observed cumulative distributions.
 
 The shape of a calibration curve could also yield other insights.
-If a model's \gls{UQ}s were too low/confident, then the normalized residuals would be too large and they would fall outside their expected prediction intervals too frequently.
-This would result in a lower fraction of points observed within the expected prediction intervals, which would correspond to a calibration curve that falls below the ideal diagonal.
+If a model's \gls{UQ}s were too low/confident, then the normalized residuals would be too large and they would fall outside their distributions too frequently.
+This would result in a lower observed cumulative distributions compared to the expected cumulative distributions, which would correspond to a calibration curve that falls below the ideal diagonal.
 Therefore, overconfident models yield calibration curves that fall under the ideal diagonal, and underconfident models yield calibration curves that fall over the ideal diagonal.
 Figure~\ref{fig:error_bars} illustrates this point by plotting calibration curves of various models alongside their parity plots that contain error bars corresponding to $\pm$2 standard deviations.
+Note that when we say a calibration curve ``falls under the diagonal'', we allude to curves whose right-hand-side fall under the diagonal.
 
 \begin{figure}
     \centering
@@ -387,7 +390,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{GP}}\label{fig:parity_gp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../NNdGP/Matern/parity.pdf}
+        \includegraphics[width=\textwidth]{../GPnnm/Matern/parity.pdf}
         \caption{\gls{dGP}}\label{fig:parity_dgp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -420,7 +423,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{GP}}\label{fig:calibration_gp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../NNdGP/Matern/calibration.pdf}
+        \includegraphics[width=\textwidth]{../GPnnm/Matern/calibration.pdf}
         \caption{\gls{dGP}}\label{fig:calibration_dgp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -452,7 +455,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{GP}}\label{fig:sharpness_gp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{../NNdGP/Matern/sharpness.pdf}
+        \includegraphics[width=\textwidth]{../GPnnm/Matern/sharpness.pdf}
         \caption{\gls{dGP}}\label{fig:sharpness_dgp}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
@@ -465,36 +468,35 @@ Table~\ref{tab:results} lists their performance metrics.
 
 \begin{table}
     \centering
-    \begin{tabular}{lrrrrrrrr}
+    \begin{tabular}{lrrrrrrrrr}
         \toprule
-        Method              & \gls{MDAE}    & \gls{MAE} & \gls{RMSE}    & \gls{MARPD}   & \gls{R2}  & MisCal    & Sha   & \gls{NLL} [$\cdot$10\textsuperscript{3}] \\
+        Method              & \gls{MDAE}    & \gls{MAE} & \gls{RMSE}    & \gls{MARPD}   & \gls{R2}  & MisCal    & CalErr    & Sha   & \gls{NLL} \\
         \midrule
-        \gls{NN}            & 0.11          & 0.19      & 0.34          & 61            & 0.80      & N/A       & N/A   & N/A \\
-        \gls{NN} ensemble   & 0.11          & 0.18      & 0.32          & 59            & 0.82      & 0.23      & 0.14  & 192.08 \\
-        \gls{BNN}           & 0.11          & 0.19      & 0.31          & 59            & 0.83      & 0.41      & 0.03  & 669.61 \\
-        \gls{dNN}           & 0.11          & 0.19      & 0.34          & 59            & 0.80      & 0.10      & 0.16  & 18.61 \\
-        \gls{GP}            & 0.11          & 0.21      & 0.39          & 61            & 0.73      & 0.28      & 0.65  & 6.41 \\
-        \gls{dGP}           & 0.11          & 0.19      & 0.33          & 59            & 0.81      & 0.05      & 0.21  & 6.09 \\
-        \gls{CFGP}          & 0.11          & 0.19      & 0.33          & 59            & 0.80      & 0.06      & 0.24  & 2.80 \\
+        \gls{NN}            & 0.11          & 0.19      & 0.34          & 61            & 0.80      & N/A       & N/A       & N/A   & N/A \\
+        \gls{NN} ensemble   & 0.11          & 0.18      & 0.32          & 59            & 0.82      & 0.12      & 1.70      & 0.14  & 192.08 \\
+        \gls{BNN}           & 0.11          & 0.19      & 0.31          & 59            & 0.83      & 0.20      & 5.32      & 0.03  & 669.61 \\
+        \gls{dNN}           & 0.11          & 0.19      & 0.34          & 59            & 0.80      & 0.05      & 0.39      & 0.16  & 18.61 \\
+        \gls{GP}            & 0.11          & 0.21      & 0.39          & 61            & 0.73      & 0.14      & 2.35      & 0.65  & 6.41 \\
+        \gls{dGP}           & 0.11          & 0.19      & 0.33          & 59            & 0.81      & 0.03      & 0.08      & 0.21  & 6.09 \\
+        \gls{CFGP}          & 0.11          & 0.19      & 0.33          & 59            & 0.80      & 0.03      & 0.13      & 0.24  & 2.80 \\
         \bottomrule
     \end{tabular}
     \caption{Performance metrics for all methods used in this study, which include:
     \glsentryfull{MDAE}, \glsentryfull{MAE}, \glsentryfull{RMSE}, \glsentryfull{MARPD},
-    \glsentryfull{R2}, miscalibration area (MisCal), sharpness (Sha), and \glsentryfull{NLL}.
+    \glsentryfull{R2}, miscalibration area (MisCal), calibration error (CalErr), sharpness (Sha), and \glsentryfull{NLL}.
     The units of \gls{MDAE}, \gls{MAE}, \gls{RMSE}, and sharpness are all in \gls{eV}.
     The units of \gls{MARPD} are in \%.
-    The miscalibration area and \gls{NLL} are unitless.}\label{tab:results}
+    The miscalibration area, calibration error, and \gls{NLL} are unitless.
+    \gls{NLL} values were all divided by 1,000 to improve readability.}\label{tab:results}
 \end{table}
 
 Regarding accuracy:  All methods' \gls{MDAE} results are virtually identical, and their \gls{MAE} results are within 10\% of each other.
 This suggests that all methods have comparable predictive accuracies for inliers.
-The plain \gls{GP} has a higher \gls{RMSE} value than the rest of the methods though.
-Thus our results suggest that our \gls{NN}-based methods are more accurate at outlier prediction than our sole non-\gls{NN}-based method.
-Each of our \gls{NN}-based methods may not have practically different accuracies between each other though.
+The plain \gls{GP} has a higher \gls{RMSE} value than the rest of the methods, indicating that it has the worst predictive accuracy for outliers.
 
 Regarding calibration:  The \gls{NN} ensemble and \gls{BNN} are overconfident; the \gls{GP} is underconfident; and the \gls{dNN}, \gls{dGP}, and \gls{CFGP} models are relatively calibrated.
 The three more calibrated methods all share a characteristic that the other methods do not:  They all start with a \gls{NN} that is dedicated for prediction alone, and then they end with some other in-series method to estimate uncertainty.
-Interestingly, this in-series method of learning predictions and then learning uncertainties is similar in spirit to how deep networks ``learn in stages'' at each subseqent hidden layer.
+Interestingly, this in-series method of learning predictions and then learning uncertainties is similar in spirit to how gradient boosted models ``learn in stages'' using an ensemble of models.
 
 Regarding sharpness:  The \gls{NN} ensemble and \gls{BNN} yield the sharpest uncertainties, although both do so at the cost of calibration.
 Among the three more calibrated models, the \gls{dNN} yields the lowest sharpness of 0.16 eV while the \gls{dGP} and \gls{CFGP} yield sharpnesses of 0.21 and 0.24 eV, respectively.
@@ -502,27 +504,26 @@ Note how \gls{GP}-based \gls{UQ} methods tend to yield less sharp uncertainties 
 This suggests that \gls{GP}s may yield more conservative \gls{UQ}s.
 
 Regarding \gls{NLL}:  The \gls{CFGP} method yields the best (i.e., lowest) \gls{NLL} value of \textit{ca.} 2,800 while both the \gls{GP} and \gls{dGP} models yield relatively moderate \gls{NLL} values of \textit{ca.} 6,000.
-Note how the under-confident \gls{GP} model has a worse miscalibration area and sharpness than the \gls{dNN} but a better \gls{NLL} value.
-Simultaneously, the two most over-confident models (\gls{NN} ensemble and \gls{BNN}) yield the worst \gls{NLL} results.
+Note how the under-confident \gls{GP} model has a worse miscalibration area, calibration error, and sharpness than the \gls{dNN} but a better \gls{NLL} value.
+Simultaneously, the two most over-confident and sharp models (\gls{NN} ensemble and \gls{BNN}) yield the worst \gls{NLL} results.
 This shows that better \gls{NLL} values correlate with relatively conservative estimates of \gls{UQ}, but not with relatively liberal estimates.
 In other words:  If we use \gls{NLL} as our main performance metric, then we will favor under-confident \gls{UQ} estimates in lieu of over-confident estimates.
 
-Given the performance metrics for accuracy, calibration, sharpness, and \gls{NLL}, we expect the \gls{CFGP} method to yield the best performing \gls{UQ} model for our dataset.
-It yields the best \gls{NLL} while maintaining a relatively competitive accuracy and calibration with a moderate sharpness.
-
-When choosing \gls{UQ} methods for different applications though, other factors should be considered.
-For example:  Although the \gls{dGP} method performed relatively well, it required the use of a hand-crafted set of features.
+Given the performance metrics for accuracy, calibration, sharpness, and \gls{NLL}, we expect the \gls{CFGP} or \gls{dGP} methods to yield the best performing \gls{UQ} models for our dataset.
+When choosing \gls{UQ} methods for different applications, other factors should be considered.
+For example:  Although the \gls{dGP} method performed relatively well, it relied on hand-crafted features.
 If future researchers wish to use the \gls{dGP} method to predict other properties from atomic structures, they may have to define their own set of features.
 This process of feature engineering is non-trivial and varies from application to application.
 In some cases, it may be easier to use a \gls{UQ} method that does not require any additional features beyond the \gls{NN} input, such as \gls{dNN} or \gls{CFGP}.
+This is why declare \gls{CFGP} as the method of choice for our study here; it has a relatively competitive accuracy, calibration, and sharpness while requiring less information than \gls{dGP}.
 
 Another factor to consider is the overhead cost of implementation.
-For example:  The \gls{NN} ensemble method is arguably the simplest \gls{NN}-based \gls{UQ} method used here and may be the easiest or fastest method to implement.
+For example:  The \gls{NN} ensemble method is arguably the simplest \gls{NN}-based \gls{UQ} method used here and may be the easiest method to implement.
 Conversely, \gls{NN} ensembles also have a higher computational training cost than some of the other methods used here, such as \gls{dNN} or \gls{CFGP}.
 This high training cost is exacerbated if the ensemble is meant to be used in an active framework where the model needs to be trained continuously.
 As another example:  The \gls{BNN} method yielded perhaps the worst results of all the methods studied here.
 It could be argued that further optimization of the \gls{BNN} could have resulted in higher performance.
-But creation and training of \gls{BNN}s is still an active area of research with less literature and support than non-Bayesian \gls{NN}s or \gls{GP}s.
+But creation and training of \gls{BNN}s is still an active area of research with less literature and support than \gls{GP}s or non-Bayesian \gls{NN}s.
 This lack of support led to us spending nearly twice as long creating a \gls{BNN} compared to the other methods.
 It follows that further optimization of the \gls{BNN} would be non-trivial and may not be worth the overhead investment.
 
@@ -531,29 +532,32 @@ It follows that further optimization of the \gls{BNN} would be non-trivial and m
 
 \section{Conclusions}
 
-We outlined a procedure for comparing different methods for \glsentryfull{UQ}.
+We examined a procedure for comparing different methods for \glsentryfull{UQ}.
 This procedure considers the accuracy of each method, the honesty of their uncertainty estimates (i.e., their calibration), and the size of their uncertainty estimates (i.e., their sharpness).
 To assess accuracy, we outlined a common set of error metrics such as \gls{MAE} or \gls{RMSE}, among others.
 To assess calibration, we showed how to create, interpret, and quantify calibration curves.
 To assess sharpness, we showed how to calculate and plot sharpness.
 To assess all three aspects simultaneously, we suggest using the \glsentryfull{NLL} as a performance metric.
-The ensemble of all these metrics and figures can then be used to judge the relative performance of various UQ methods in a holistic fashion.
+The ensemble of all these metrics and figures can be used to judge the relative performance of various \gls{UQ} methods in a holistic fashion.
 
-As a case sutdy, we tested six different methods for predicting \glsentryfull{DFT} calculated adsorption energies with \gls{UQ}.
-The best performing method was a \glsentryfull{CFGP}, which used a pre-trained convolutional output from a \gls{NN} as features for a subsequent \gls{GP} to make uncertanity estimates.
+As a case study, we tested six different methods for predicting \glsentryfull{DFT} calculated adsorption energies with \gls{UQ}.
+The best performing method was a \glsentryfull{CFGP}, which used a pre-trained convolutional output from a \gls{NN} as features for a subsequent \gls{GP} that made probabilistic predictions.
 Our studies also showed that the \gls{GP}-based methods we tested tended to yield higher and more conservative uncertainty estimates than the methods that used only \gls{NN}s and \gls{NN} derivatives.
 We also found that in-series methods tended to yield more calibrated models---i.e., methods that use one model to make value predictions and then a subsequent model to make uncertainty estimates were more calibrated than models that attempted to make value and uncertainty predictions simultaneously.
-These results are limited to our dataset though.
+These results are limited to our dataset.
 Results may vary for studies with different applications, different models, or different hyperparameters.
-But the underpinning procedure we used to compare each of these models is still broadly applicable.
+But the underpinning procedure we used to compare these models is still broadly applicable.
 
 Note that it would be possible to recalibrate\cite{Kuleshov2018} each of the models in this study to improve their uncertainty estimates.
-We purposefully ommitted recalibration in this study to (1) simplify the illustration of the \gls{UQ} assessment procedure; (2) assess the innate performance of each of these UQ methods without confounding with recalibration methods; and (3) reduce overhead investment.
-Future work should consider recalibration if the feasible UQ methods provide insufficiently calibrated uncertainty predictions
+We purposefully omitted recalibration in this study to (1) simplify the illustration of the \gls{UQ} assessment procedure; (2) assess the innate performance of each of these \gls{UQ} methods without confounding with recalibration methods; and (3) reduce overhead investment.
+Future work should consider recalibration if the feasible \gls{UQ} methods provide insufficiently calibrated uncertainty predictions
 
-Future work may also consider uncertainty propagation from the underlying training data.
+Future work may also consider inductively biased \gls{UQ}s.
 For example:  If we used the \gls{BEEF},\cite{Wellendorff2012} then our \gls{DFT} calculated adsorption energies would have been distributions rather than than single point estimates.
 Such distributions could be propagated to certain \gls{UQ} surrogate models, e.g., as a variable-variance kernel in a \gls{GP}-type method.
+As another example of inductively biased \gls{UQ}s:  A model may be able to make low-uncertainty predictions on a \gls{DFT}-optimized structure and then also make high-uncertainty predictions on a similar but \gls{DFT}-unoptimized structure.
+\gls{UQ}s do not need to be derived strictly from data.
+They may also be derived from previous knowledge.
 
 
 %%%%%%%%%%%%%%%%%%%% Misc %%%%%%%%%%%%%%%%%%%%
@@ -564,7 +568,7 @@ The code dependencies are listed inside the repository.
 \section*{Author information} Corresponding author email:  zulissi@andrew.cmu.edu.
 The authors declare no competing financial interest.
 
-\section*{Acknowledgements} This research used resources of the National Energy Research Scientific Computing Center, a DOE Office of Science User Facility supported by the Office of Science of the U.S. Department of Energy under Contract No. DE-AC02-05CH11231. % chktex 8
+\section*{Acknowledgments} This research used resources of the National Energy Research Scientific Computing Center, a DOE Office of Science User Facility supported by the Office of Science of the U.S. Department of Energy under Contract No. DE-AC02-05CH11231. % chktex 8
 We also acknowledge the exceptional documentation and clear examples in the GPyTorch\cite{Gardner2018} repository, which formed the basis on much of the \gls{GP} code used for this work.
 
 
@@ -573,4 +577,4 @@ We also acknowledge the exceptional documentation and clear examples in the GPyT
 \clearpage
 \bibliography{uncertainty_benchmarking}
 
-\end{document}
+\end{document}  % chktex 17
