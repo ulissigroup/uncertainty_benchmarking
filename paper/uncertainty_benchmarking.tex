@@ -113,8 +113,12 @@ We acknowledge that such insights may not be transferable to other applications,
 
 \subsection{Dataset information}
 
-All regressions in this paper were performed on a dataset of \gls{DFT} calculated adsorption energies created with \gls{GASpy}\cite{Tran2018, Tran2018a}.
-These data included energies from 21,269 different H adsorption sites; 1,594 N sites; 18,437 CO sites; 2,515 O sites; and 3,464 OH sites; totaling in 47,279 data points.
+All regressions in this paper were performed using a dataset of 47,279 \gls{DFT} calculated adsorption energies created with \gls{GASpy}\cite{Tran2018, Tran2018a}.
+Within this dataset, there were 52 different elements within the 1,952 bulk structures used as bases for the adsorption surfaces.
+The 61 bulk structures that contained one element encompassed 5,844 of the adsorption calculations; the 1,057 bulk structures that contained two elements encompassed 31,651 of the calculations; the 774 bulk structures that contained three elements encompassed 9,139 of the calculations; and the 60 bulk structures that contained four or five elements encompassed 645 of the calculations.
+The dataset also comprised 9,102 symmetrically distinct surfaces and 29,843 distinct coordination environments (as defined by the surface and the adsorbate neighbors).
+Lastly, the dataset was comprised of 21,269 H adsorption energies; 18,437 CO adsorption energies; 3,464 OH adsorption energies; 2,515 O adsorption energies; and 1,594 N adsorption energies.
+
 \gls{GASpy} performed all \gls{DFT} calculations using \gls{VASP}\cite{Kresse1993, Kresse1994, Kresse1996, Kresse1996a} version 5.4 implemented in \gls{ASE}\cite{HjorthLarsen2017}.
 The \gls{rPBE} functionals\cite{Hammer1999} were used along with \gls{VASP}'s pseudopotentials, and no spin magnetism or dispersion corrections were used.
 Bulk relaxations were performed with a $10\times10\times10$ k-point grid and a 500 \gls{eV} cutoff, and only isotropic relaxation were allowed during this bulk relaxation.
