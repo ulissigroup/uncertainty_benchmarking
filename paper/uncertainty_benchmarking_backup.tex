@@ -159,10 +159,8 @@ Figure~\ref{fig:methods} illustrates all of the methods we investigate in this s
 
 \textbf{\glsentrytext{NN}:}
 To establish a baseline for predictive accuracy, we re-trained a previously reported \gls{NN}\cite{Xie2018, Back2019} on this study's training set.
-This \gls{NN} model projects a three-dimensional atomic structure into a graph, which is then fed into convolutional layers to extract local atomic information for predicting global target properties.
+This \gls{NN} model projects a three-dimensional atomic structure into a graph, which is then fed into a convolutional neural network to predict various properties.
 In this case, we predict \gls{DFT}-calculated adsorption energies, $\Delta$E.
-The graph consists of nodes representing atoms and edges representing distances between atoms. 
-The NN updates the node features using the local information extracted in the convolutional layers, then hidden layers in the NN maps the node features to the adsorption energies.
 Reference \citet{Back2019} for additional details.
 
 \textbf{\glsentrytext{NN} Ensemble:}
@@ -173,11 +171,10 @@ For the final prediction of the ensemble we computed the mean of the set of mode
 
 \textbf{\glsentrytext{BNN}:}
 The aim of \gls{BNN} is to determine the posterior distribution of model parameters rather than a single optimal value of the parameters.
-In practice, inferring true posterior distributions is very difficult and even infeasible in most cases.
-Thus, we approximate the model posterior to be as close as possible to the true posterior.
-The same \gls{NN} architecture was used, but we converted the \gls{NN} into \gls{BNN} by assigning posterior distributions to all model parameters in the hidden layers in the \gls{NN} model. 
-The \gls{BNN} then approximated the true posterior distributions using variational inference so that it could use the approximated posterior to predict the adsorption energies.
-We sampled the model parameters K times from the approximated posterior distributions, and used the mean of these predictions as the final prediction and the standard deviation of these predictions as the estimation of uncertainty.
+In practice, inferring true posterior is very difficult and even infeasible in most cases.
+Thus, we approximate the model posterior to be as close as possible to the true posterior by doing variational inference.
+This could be done by training the \gls{BNN} to minimize the Kullback-Leibler divergence between the variational distribution and the true posterior.
+We sampled the model parameters K times from the approximated posterior, and used the mean of these predictions as the final prediction and the standard deviation of these predictions as the estimation of uncertainty.
 We implemented the \gls{BNN} and performed variational inference using Pyro.\cite{Bingham2018}
 
 \textbf{\glsentrytext{dNN}:}
