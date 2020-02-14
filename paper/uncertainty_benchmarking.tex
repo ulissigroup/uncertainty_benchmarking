@@ -26,6 +26,7 @@
 \newacronym{MARPD}{MARPD}{Mean Absolute Relative Percent Difference}
 \newacronym{R2}{R\textsuperscript{2}}{R\textsuperscript{2} correlation coefficient}
 \newacronym{NN}{NN}{crystal graph convolutional Neural Network}
+\newacronym{dropout}{Dropout NN}{Dropout Neural Networks}
 \newacronym{BNN}{BNN}{Bayesian Neural Network}
 \newacronym{MLE}{MLE}{Maximum Likelihood Estimation}
 \newacronym{CFGP}{CFGP}{Convolution-Fed Gaussian Process}
@@ -46,6 +47,8 @@
 \affiliation{Machine Learning Department, Carnegie Mellon University, Pittsburgh, PA 15217}
 \altaffiliation{These authors contributed equally to this work}
 \author{Junwoong Yoon}
+\affiliation{Chemical Engineering Department, Carnegie Mellon University, Pittsburgh, PA 15217}
+\author{Qingyang Zhang}
 \affiliation{Chemical Engineering Department, Carnegie Mellon University, Pittsburgh, PA 15217}
 \author{Eric Xing}
 \affiliation{Machine Learning Department, Carnegie Mellon University, Pittsburgh, PA 15217}
@@ -135,6 +138,13 @@ After tuning, we calculated the test set results and present them in this paper 
 Note that the test results were obtained using models that were trained only using the training set, not the validation set.
 This is acceptable because we only seek to compare methods here, not to optimize them.
 
+Note that random splits such as this may yield overly optimistic model results.
+If a model created with the training set is meant to make extrapolative predictions in feature domains outside of the training set, then it may be appropriate to use a train/validate/test split using k-means clustering\cite{Meredig2018} rather than random splitting.
+If the model is meant to be used in an online and iterative fashion, then it may be appropriate to use a time-series split\cite{Hyndman2014}.
+If the model is meant to be used to interpolate within a given feature space, then the basic random split may be appropriate.
+We chose to use a basic random split in this work to simplify the results for illustrative purposes.
+Future work for different applications should use splitting methods that align with the intended use of the models to be generated.
+
 
 \subsection{Regression methods}
 
@@ -162,7 +172,7 @@ To establish a baseline for predictive accuracy, we re-trained a previously repo
 This \gls{NN} model projects a three-dimensional atomic structure into a graph, which is then fed into convolutional layers to extract local atomic information for predicting global target properties.
 In this case, we predict \gls{DFT}-calculated adsorption energies, $\Delta$E.
 The graph consists of nodes representing atoms and edges representing distances between atoms. 
-The NN updates the node features using the local information extracted in the convolutional layers, then hidden layers in the NN maps the node features to the adsorption energies.
+The \gls{NN} updates the node features using the local information extracted in the convolutional layers, then hidden layers in the \gls{NN} maps the node features to the adsorption energies.
 Reference \citet{Back2019} for additional details.
 
 \textbf{\glsentrytext{NN} Ensemble:}
@@ -177,8 +187,16 @@ In practice, inferring true posterior distributions is very difficult and even i
 Thus, we approximate the model posterior to be as close as possible to the true posterior.
 The same \gls{NN} architecture was used, but we converted the \gls{NN} into \gls{BNN} by assigning posterior distributions to all model parameters in the hidden layers in the \gls{NN} model. 
 The \gls{BNN} then approximated the true posterior distributions using variational inference so that it could use the approximated posterior to predict the adsorption energies.
-We sampled the model parameters K times from the approximated posterior distributions, and used the mean of these predictions as the final prediction and the standard deviation of these predictions as the estimation of uncertainty.
+We sampled the model parameters 20 times from the approximated posterior distributions, and used the mean of these predictions as the final prediction and the standard deviation of these predictions as the estimation of uncertainty.
 We implemented the \gls{BNN} and performed variational inference using Pyro.\cite{Bingham2018}
+
+\textbf{\glsentrytext{dropout}:}
+\gls{dropout} have been shown to approximate Bayesian models.\cite{Gal2016}
+We created a \gls{dropout} by first replicating the exact architecture used to create the convolutional \gls{NN} outlined previously. 
+Then we enforced a random dropout rate of 30\% in the dense hidden layers that followed the convolutional layers.
+The nodes were randomly dropped out during both training and prediction.
+To make predictions, we sampled the \gls{dropout} 20 times.
+The mean of the predictions was used as the final prediction of the \gls{dropout}, and the standard deviation of the predictions was used as the estimation of uncertainty.
 
 \textbf{\glsentrytext{dNN}:}
 Suppose we have trained a \gls{NN}.
@@ -389,6 +407,10 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{BNN}}\label{fig:parity_bnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../dropout/parity.pdf}
+        \caption{\gls{dropout}}\label{fig:parity_dropout}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
         \includegraphics[width=\textwidth]{../NNdNN/parity.pdf}
         \caption{\gls{dNN}}\label{fig:parity_dnn}
     \end{subfigure}
@@ -420,6 +442,10 @@ Table~\ref{tab:results} lists their performance metrics.
     \begin{subfigure}{0.32\textwidth}
         \includegraphics[width=\textwidth]{../BNN/calibration.pdf}
         \caption{\gls{BNN}}\label{fig:calibration_bnn}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../dropout/calibration.pdf}
+        \caption{\gls{dropout}}\label{fig:calibration_dropout}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
         \includegraphics[width=\textwidth]{../NNdNN/calibration.pdf}
@@ -454,6 +480,10 @@ Table~\ref{tab:results} lists their performance metrics.
         \caption{\gls{BNN}}\label{fig:sharpness_bnn}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{../dropout/sharpness.pdf}
+        \caption{\gls{dropout}}\label{fig:sharpness_dropout}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
         \includegraphics[width=\textwidth]{../NNdNN/sharpness.pdf}
         \caption{\gls{dNN}}\label{fig:sharpness_dnn}
     \end{subfigure}
@@ -482,6 +512,7 @@ Table~\ref{tab:results} lists their performance metrics.
         \gls{NN}            & 0.11          & 0.19      & 0.34          & 61            & 0.80      & N/A       & N/A       & N/A   & N/A \\
         \gls{NN} ensemble   & 0.11          & 0.18      & 0.32          & 59            & 0.82      & 0.12      & 1.70      & 0.14  & 192.08 \\
         \gls{BNN}           & 0.11          & 0.19      & 0.31          & 59            & 0.83      & 0.20      & 5.32      & 0.03  & 669.61 \\
+        \gls{dropout}       & 0.11          & 0.19      & 0.34          & 61            & 0.79      & 0.14      & 2.52      & 0.09  & 7.38$\cdot$10\textsuperscript{14} \\
         \gls{dNN}           & 0.11          & 0.19      & 0.34          & 59            & 0.80      & 0.05      & 0.39      & 0.16  & 18.61 \\
         \gls{GP}            & 0.11          & 0.21      & 0.39          & 61            & 0.73      & 0.14      & 2.35      & 0.65  & 6.41 \\
         \gls{dGP}           & 0.11          & 0.19      & 0.33          & 59            & 0.81      & 0.03      & 0.08      & 0.21  & 6.09 \\
@@ -501,18 +532,18 @@ Regarding accuracy:  All methods' \gls{MDAE} results are virtually identical, an
 This suggests that all methods have comparable predictive accuracies for inliers.
 The plain \gls{GP} has a higher \gls{RMSE} value than the rest of the methods, indicating that it has the worst predictive accuracy for outliers.
 
-Regarding calibration:  The \gls{NN} ensemble and \gls{BNN} are overconfident; the \gls{GP} is underconfident; and the \gls{dNN}, \gls{dGP}, and \gls{CFGP} models are relatively calibrated.
+Regarding calibration:  The \gls{NN} ensemble, \gls{BNN}, and \gls{dropout} are overconfident; the \gls{GP} is underconfident; and the \gls{dNN}, \gls{dGP}, and \gls{CFGP} models are relatively calibrated.
 The three more calibrated methods all share a characteristic that the other methods do not:  They all start with a \gls{NN} that is dedicated for prediction alone, and then they end with some other in-series method to estimate uncertainty.
 Interestingly, this in-series method of learning predictions and then learning uncertainties is similar in spirit to how gradient boosted models ``learn in stages'' using an ensemble of models.
 
-Regarding sharpness:  The \gls{NN} ensemble and \gls{BNN} yield the sharpest uncertainties, although both do so at the cost of calibration.
+Regarding sharpness:  The \gls{NN} ensemble, \gls{BNN}, and \gls{dropout} models yield the sharpest uncertainties, although they do so at the cost of calibration.
 Among the three more calibrated models, the \gls{dNN} yields the lowest sharpness of 0.16 eV while the \gls{dGP} and \gls{CFGP} yield sharpnesses of 0.21 and 0.24 eV, respectively.
 Note how \gls{GP}-based \gls{UQ} methods tend to yield less sharp uncertainties than methods based purely on \gls{NN}s.
 This suggests that \gls{GP}s may yield more conservative \gls{UQ}s.
 
 Regarding \gls{NLL}:  The \gls{CFGP} method yields the best (i.e., lowest) \gls{NLL} value of \textit{ca.} 2,800 while both the \gls{GP} and \gls{dGP} models yield relatively moderate \gls{NLL} values of \textit{ca.} 6,000.
 Note how the under-confident \gls{GP} model has a worse miscalibration area, calibration error, and sharpness than the \gls{dNN} but a better \gls{NLL} value.
-Simultaneously, the two most over-confident and sharp models (\gls{NN} ensemble and \gls{BNN}) yield the worst \gls{NLL} results.
+Simultaneously, the three most over-confident and sharp models (\gls{NN} ensemble, \gls{BNN}, and \gls{dropout}) yield the worst \gls{NLL} results.
 This shows that better \gls{NLL} values correlate with relatively conservative estimates of \gls{UQ}, but not with relatively liberal estimates.
 In other words:  If we use \gls{NLL} as our main performance metric, then we will favor under-confident \gls{UQ} estimates in lieu of over-confident estimates.
 
@@ -569,14 +600,16 @@ They may also be derived from previous knowledge.
 
 %%%%%%%%%%%%%%%%%%%% Misc %%%%%%%%%%%%%%%%%%%%
 
-\section*{Code availability} Visit \texttt{https://github.com/ulissigroup/uncertainty\_benchmarking} for the code used to create the results discussed in this paper.
-The code dependencies are listed inside the repository.
-
 \section*{Author information} Corresponding author email:  zulissi@andrew.cmu.edu.
 The authors declare no competing financial interest.
 
 \section*{Acknowledgments} This research used resources of the National Energy Research Scientific Computing Center, a DOE Office of Science User Facility supported by the Office of Science of the U.S. Department of Energy under Contract No. DE-AC02-05CH11231. % chktex 8
 We also acknowledge the exceptional documentation and clear examples in the GPyTorch\cite{Gardner2018} repository, which formed the basis on much of the \gls{GP} code used for this work.
+
+\section*{Code availability} Visit \texttt{https://github.com/ulissigroup/uncertainty\_benchmarking} for the code used to create the results discussed in this paper.
+The code dependencies are listed inside the repository.
+
+\section*{Data availability} The data that support the findings of this study are available from the corresponding author upon reasonable request.
 
 
 %%%%%%%%%%%%%%%%%%%% Bibliography %%%%%%%%%%%%%%%%%%%%
