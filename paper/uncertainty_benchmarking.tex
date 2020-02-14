@@ -177,7 +177,7 @@ In practice, inferring true posterior distributions is very difficult and even i
 Thus, we approximate the model posterior to be as close as possible to the true posterior.
 The same \gls{NN} architecture was used, but we converted the \gls{NN} into \gls{BNN} by assigning posterior distributions to all model parameters in the hidden layers in the \gls{NN} model. 
 The \gls{BNN} then approximated the true posterior distributions using variational inference so that it could use the approximated posterior to predict the adsorption energies.
-We sampled the model parameters K times from the approximated posterior distributions, and used the mean of these predictions as the final prediction and the standard deviation of these predictions as the estimation of uncertainty.
+We sampled the model parameters 20 times from the approximated posterior distributions, and used the mean of these predictions as the final prediction and the standard deviation of these predictions as the estimation of uncertainty.
 We implemented the \gls{BNN} and performed variational inference using Pyro.\cite{Bingham2018}
 
 \textbf{\glsentrytext{dNN}:}
