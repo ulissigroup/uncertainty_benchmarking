@@ -14,7 +14,7 @@ You will need:
 - Jupyter >= 1.0
 - ipycache = 0.1.5.dev0
 - Seaborn >= 0.9
-- Shapely >= 1.6
+- [Corner](https://github.com/dfm/corner.py)
 
 You will also need to hack your installation of `skorch`.
 In `skorch/skorch/dataset.py`, delete these lines:
