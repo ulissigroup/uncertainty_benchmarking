@@ -135,6 +135,13 @@ After tuning, we calculated the test set results and present them in this paper 
 Note that the test results were obtained using models that were trained only using the training set, not the validation set.
 This is acceptable because we only seek to compare methods here, not to optimize them.
 
+Note that random splits such as this may yield overly optimistic model results.
+If a model created with the training set is meant to make extrapolative predictions in feature domains outside of the training set, then it may be appropriate to use a train/validate/test split using k-means clustering\cite{Meredig2018} rather than random splitting.
+If the model is meant to be used in an online and iterative fashion, then it may be appropriate to use a time-series split\cite{Hyndman2014}.
+If the model is meant to be used to interpolate within a given feature space, then the basic random split may be appropriate.
+We chose to use a basic random split in this work to simplify the results for illustrative purposes.
+Future work for different applications should use splitting methods that align with the intended use of the models to be generated.
+
 
 \subsection{Regression methods}
 
