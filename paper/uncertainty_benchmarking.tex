@@ -531,6 +531,7 @@ Table~\ref{tab:results} lists their performance metrics.
 Regarding accuracy:  All methods' \gls{MDAE} results are virtually identical, and their \gls{MAE} results are within 10\% of each other.
 This suggests that all methods have comparable predictive accuracies for inliers.
 The plain \gls{GP} has a higher \gls{RMSE} value than the rest of the methods, indicating that it has the worst predictive accuracy for outliers.
+Correlations between residuals and uncertainty estimates are discussed in the Supplementary Information section briefly.
 
 Regarding calibration:  The \gls{NN} ensemble, \gls{BNN}, and \gls{dropout} are overconfident; the \gls{GP} is underconfident; and the \gls{dNN}, \gls{dGP}, and \gls{CFGP} models are relatively calibrated.
 The three more calibrated methods all share a characteristic that the other methods do not:  They all start with a \gls{NN} that is dedicated for prediction alone, and then they end with some other in-series method to estimate uncertainty.
