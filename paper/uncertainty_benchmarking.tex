@@ -93,7 +93,7 @@ For example, given an input for which we wish to make a prediction, a predictive
 Performance metrics for predictive \gls{UQ} methods aim to assess how well a given quantification of the probabilities of potential true outcomes adheres to a set of observations of these outcomes.
 Some of the performance metrics for predictive \gls{UQ} are agnostic to prediction performance---they provide an assessment of the uncertainty independent of the predictive accuracy (i.e.\ a method can predict badly, but could still accurately quantify its own uncertainty).
 
-We have seen few\cite{Janet2019} comparisons of different methods for \gls{UQ} within the field of catalysis and materials informatics.
+We have seen few\cite{Janet2019, Scalia2019} comparisons of different methods for \gls{UQ} within the field of catalysis and materials informatics.
 Here we examine a protocol\cite{Kuleshov2018} for comparing the performance of different modeling and \gls{UQ} methods (Figure~\ref{fig:overview}).
 We then illustrate the protocol on a case study where we compare various models' abilities to predict \gls{DFT} calculated adsorption energies.
 We also offer anecdotal insights from our case study.
@@ -120,7 +120,7 @@ All regressions in this paper were performed using a dataset of 47,279 \gls{DFT}
 Within this dataset, there were 52 different elements within the 1,952 bulk structures used as bases for the adsorption surfaces.
 The 61 bulk structures that contained one element encompassed 5,844 of the adsorption calculations; the 1,057 bulk structures that contained two elements encompassed 31,651 of the calculations; the 774 bulk structures that contained three elements encompassed 9,139 of the calculations; and the 60 bulk structures that contained four or five elements encompassed 645 of the calculations.
 The dataset also comprised 9,102 symmetrically distinct surfaces and 29,843 distinct coordination environments (as defined by the surface and the adsorbate neighbors).
-Lastly, the dataset was comprised of 21,269 H adsorption energies; 18,437 CO adsorption energies; 3,464 OH adsorption energies; 2,515 O adsorption energies; and 1,594 N adsorption energies.
+Lastly, the dataset comprised 21,269 H adsorption energies; 18,437 CO adsorption energies; 3,464 OH adsorption energies; 2,515 O adsorption energies; and 1,594 N adsorption energies.
 
 \gls{GASpy} performed all \gls{DFT} calculations using \gls{VASP}\cite{Kresse1993, Kresse1994, Kresse1996, Kresse1996a} version 5.4 implemented in \gls{ASE}\cite{HjorthLarsen2017}.
 The \gls{rPBE} functionals\cite{Hammer1999} were used along with \gls{VASP}'s pseudopotentials, and no spin magnetism or dispersion corrections were used.
