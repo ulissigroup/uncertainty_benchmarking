@@ -25,6 +25,7 @@
 \newacronym{MDAE}{MDAE}{Median Absolute Error}
 \newacronym{MARPD}{MARPD}{Mean Absolute Relative Percent Difference}
 \newacronym{R2}{R\textsuperscript{2}}{R\textsuperscript{2} correlation coefficient}
+\newacronym{Cv}{C\textsubscript{v}}{coefficient of variation}
 \newacronym{NN}{NN}{crystal graph convolutional Neural Network}
 \newacronym{dropout}{Dropout NN}{Dropout Neural Networks}
 \newacronym{BNN}{BNN}{Bayesian Neural Network}
@@ -94,7 +95,7 @@ Performance metrics for predictive \gls{UQ} methods aim to assess how well a giv
 Some of the performance metrics for predictive \gls{UQ} are agnostic to prediction performance---they provide an assessment of the uncertainty independent of the predictive accuracy (i.e.\ a method can predict badly, but could still accurately quantify its own uncertainty).
 
 We have seen few\cite{Janet2019, Scalia2019} comparisons of different methods for \gls{UQ} within the field of catalysis and materials informatics.
-Here we examine a protocol\cite{Kuleshov2018} for comparing the performance of different modeling and \gls{UQ} methods (Figure~\ref{fig:overview}).
+Here we examine a protocol\cite{Kuleshov2018, Levi2020} for comparing the performance of different modeling and \gls{UQ} methods (Figure~\ref{fig:overview}).
 We then illustrate the protocol on a case study where we compare various models' abilities to predict \gls{DFT} calculated adsorption energies.
 We also offer anecdotal insights from our case study.
 We acknowledge that such insights may not be transferable to other applications, but we find value in sharing them so that others can build their own intuition.
@@ -250,15 +251,17 @@ We used \gls{MDAE} because is insensitive to outliers and is therefore a good me
 We used \gls{RMSE} because it is sensitive to outliers and is therefore a good measure of worst-case accuracy.
 We used \gls{MAE} because it lies between \gls{MDAE} and \gls{RMSE} in terms of sensitivity to outliers.
 We used \gls{MARPD} and \gls{R2} because they provide normalized measures of accuracy that may be more interpretable for those unfamiliar with adsorption energy measurements in \gls{eV}.
-\gls{MARPD} values were calculated with Equation~\ref{eq:marpd} where $n$ is the index of a data point, $N$ is the total number of data points, $x_n$ is the true value of the data point, and $\hat{x}_n$ is the model's estimate of $x_n$.
-In this case, $x_n$ is a DFT-calculated adsorption energy and $\hat{x}_n$ is the surrogate-model-calculated adsorption energy.
-The ensemble of these metrics provide a more robust view of accuracy than any one metric can provide alone.
+\gls{MARPD} values were calculated with Equation~\ref{eq:marpd}: 
 
 \begin{equation}\label{eq:marpd}
     MARPD = \frac{1}{N} \sum_{n=1}^{N} \abs{100 \cdot \frac{\hat{x}_n - x_n}{\abs{\hat{x}_n} + \abs{x_n}}}
 \end{equation}
 
-To assess the calibration (or ``honesty'') of these models' UQs, we created calibration curves.
+\noindent where $n$ is the index of a data point, $N$ is the total number of data points, $x_n$ is the true value of the data point, and $\hat{x}_n$ is the model's estimate of $x_n$.
+In this case, $x_n$ is a DFT-calculated adsorption energy and $\hat{x}_n$ is the surrogate-model-calculated adsorption energy.
+The ensemble of these metrics provide a more robust view of accuracy than any one metric can provide alone.
+
+To assess the calibration (or ``honesty'') of these models' \gls{UQ}s, we created calibration curves.
 A calibration curve ``displays the true frequency of points in each interval relative to the predicted fraction of points in that interval'', as outlined by \citet{Kuleshov2018}.
 In other words:  We used the standard deviation predictions to create Gaussian random variables for each test point and then tested how well the residuals followed their respective Gaussian random variables.
 Thus ``well-calibrated'' models had residuals that created Gaussian distributions whose standard deviations were close to the model's predicted standard deviations.
@@ -267,7 +270,7 @@ We also calculated the calibration errors\cite{Kuleshov2018} of our models, whic
 
 As \citet{Kuleshov2018} also pointed out, well-calibrated models are necessary but not sufficient for useful \gls{UQ}s.
 For example:  A well-calibrated model could still have large uncertainty estimates, which are inherently less useful than well-calibrated and small uncertainty estimates.
-This idea of having small uncertainty estimates is called ``sharpness'', and \citet{Kuleshov2018} define it with Equation~\ref{eq:og_sharpness}
+This idea of having small uncertainty estimates is called ``sharpness'', and \citet{Kuleshov2018} define it with Equation~\ref{eq:og_sharpness}:
 
 \begin{equation}\label{eq:og_sharpness}
     sha = \frac{1}{N} \sum_{n=1}^{N} var(F_n)
@@ -283,19 +286,35 @@ In other words:  Sharpness is akin to the average of the \gls{ML}-predicted stan
     sha = \sqrt{\frac{1}{N} \sum_{n=1}^{N} var(F_n)}
 \end{equation}
 
+Another consideration is the dispersion of the uncertainty estimates.
+If a model predicts a constant value for uncertainty, it may still be able to perform well with regards to calibration or sharpness.
+Constant values for uncertainty are likely to fail when models are used to make predictions outside the bounds of the training data.
+One way to address this issue is to calculate the \gls{Cv}\cite{Levi2020}.
+See Equation~\ref{eq:dispersion}:
+
+\begin{equation}\label{eq:dispersion}
+    C_v = \frac{\sqrt{\frac{\sum_{n=1}^{N}(\sigma_n-\mu_{\sigma})^2}{N-1}}}{\mu_{\sigma}}  % chktex 3
+\end{equation}
+
+\noindent where $\sigma_n$ is the predicted standard deviation of point $n$, $\mu_{\sigma}$ is the average value of $\sigma_n$, and $N$ is the total number of test points.
+Low values of \gls{Cv} indicate a narrow dispersion of uncertainty estimates, which may suggest poor performance in out-of-domain predictions.
+Thus a higher \gls{Cv} may indicate more robust uncertainty estimates, but as \citet{Scalia2019} point out, the optimal dispersion is a function of the validation/test data distribution.
+Therefore, \gls{Cv} should be used as a secondary screening metric rather than a primary performance metric.
+
 We also assessed the performance of each predictive uncertainty method by comparing their \gls{NLL} values the test set.
 For each test point, we established a Gaussian probability distribution using the mean and uncertainty predictions of each \gls{UQ} model.
 Then we calculated the conditional probability of observing the true value of the test point given the probability distribution created from the \gls{UQ}; this is the likelihood of one test point.
 We then calculated the product of all the likelihoods of all test points, which yielded the total test likelihood.
 It follows that better \gls{UQ} methods yield higher total likelihood values.
 Equivalently, we could calculate the natural logarithms of each likelihood, sum them, and then take the negative of this value; this is \gls{NLL}.
-Equation~\ref{eq:nll} shows how we calculated \gls{NLL}, where $y_i$ is the true value of a test point, $\hat{y}_i$ is a model's predicted mean value at that test point, $\hat{\sigma_i}^2$ is the model's predicted variance at that test point, $n$ is the set of all test points, and $N(x, y)$ is a normal distribution with mean $x$ and variance $y$.
+Equation~\ref{eq:nll} shows how we calculated \gls{NLL}:
 
 \begin{equation}\label{eq:nll}
     NLL = - \sum_{i=1}^{n} \ln{P(y_i | N(\hat{y_i}, \hat{\sigma_i}^2))}
 \end{equation}
 
-\noindent Note how the \gls{NLL} value depends on the size and location of the test set.
+\noindent where $y_i$ is the true value of a test point, $\hat{y}_i$ is a model's predicted mean value at that test point, $\hat{\sigma_i}^2$ is the model's predicted variance at that test point, $n$ is the set of all test points, and $N(x, y)$ is a normal distribution with mean $x$ and variance $y$.
+Note how the \gls{NLL} value depends on the size and location of the test set.
 This means that the absolute value of \gls{NLL} changes from application to application, and so a ``good'' \gls{NLL} value must be contextualized within a particular test set.
 Within a test set, a lower \gls{NLL} value indicates a better fit.
 We also note that we assumed Gaussian distributions for our \gls{UQ} methods' predictions.
@@ -505,27 +524,26 @@ Table~\ref{tab:results} lists their performance metrics.
 
 \begin{table}
     \centering
-    \begin{tabular}{lrrrrrrrrr}
-        \toprule
-        Method              & \gls{MDAE}    & \gls{MAE} & \gls{RMSE}    & \gls{MARPD}   & \gls{R2}  & MisCal    & CalErr    & Sha   & \gls{NLL} \\
-        \midrule
-        \gls{NN}            & 0.11          & 0.19      & 0.34          & 61            & 0.80      & N/A       & N/A       & N/A   & N/A \\
-        \gls{NN} ensemble   & 0.11          & 0.18      & 0.32          & 59            & 0.82      & 0.12      & 1.70      & 0.14  & 192.08 \\
-        \gls{BNN}           & 0.11          & 0.19      & 0.31          & 59            & 0.83      & 0.20      & 5.32      & 0.03  & 669.61 \\
-        \gls{dropout}       & 0.11          & 0.19      & 0.34          & 61            & 0.79      & 0.14      & 2.52      & 0.09  & 7.38$\cdot$10\textsuperscript{14} \\
-        \gls{dNN}           & 0.11          & 0.19      & 0.34          & 59            & 0.80      & 0.05      & 0.39      & 0.16  & 18.61 \\
-        \gls{GP}            & 0.11          & 0.21      & 0.39          & 61            & 0.73      & 0.14      & 2.35      & 0.65  & 6.41 \\
-        \gls{dGP}           & 0.11          & 0.19      & 0.33          & 59            & 0.81      & 0.03      & 0.08      & 0.21  & 6.09 \\
-        \gls{CFGP}          & 0.11          & 0.19      & 0.33          & 59            & 0.80      & 0.03      & 0.13      & 0.24  & 2.80 \\
-        \bottomrule
-    \end{tabular}
-    \caption{Performance metrics for all methods used in this study, which include:
-    \glsentryfull{MDAE}, \glsentryfull{MAE}, \glsentryfull{RMSE}, \glsentryfull{MARPD},
-    \glsentryfull{R2}, miscalibration area (MisCal), calibration error (CalErr), sharpness (Sha), and \glsentryfull{NLL}.
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{lrrrrrrrrrr}
+            \toprule
+            Method              & \gls{MDAE}    & \gls{MAE} & \gls{RMSE}    & \gls{MARPD}   & \gls{R2}  & MisCal    & CalErr    & Sha   & \gls{Cv}    & \gls{NLL}$\cdot$10\textsuperscript{3}\\
+            \midrule
+            \gls{NN}            & 0.11          & 0.19      & 0.34          & 61            & 0.80      & N/A       & N/A       & N/A   & N/A         & N/A \\
+            \gls{NN} ensemble   & 0.11          & 0.18      & 0.32          & 59            & 0.82      & 0.12      & 1.70      & 0.14  & 1.06        & 192.08 \\
+            \gls{BNN}           & 0.11          & 0.19      & 0.31          & 59            & 0.83      & 0.20      & 5.32      & 0.03  & 0.30        & 669.61 \\
+            \gls{dropout}       & 0.11          & 0.19      & 0.34          & 61            & 0.79      & 0.14      & 2.52      & 0.09  & 0.82        & 7.38$\cdot$10\textsuperscript{14} \\
+            \gls{dNN}           & 0.11          & 0.19      & 0.34          & 59            & 0.80      & 0.05      & 0.39      & 0.16  & 0.71        & 18.61 \\
+            \gls{GP}            & 0.11          & 0.21      & 0.39          & 61            & 0.73      & 0.14      & 2.35      & 0.65  & 0.21        & 6.41 \\
+            \gls{dGP}           & 0.11          & 0.19      & 0.33          & 59            & 0.81      & 0.03      & 0.08      & 0.21  & 0.34        & 6.09 \\
+            \gls{CFGP}          & 0.11          & 0.19      & 0.33          & 59            & 0.80      & 0.03      & 0.13      & 0.24  & 0.33        & 2.80 \\
+            \bottomrule
+        \end{tabular}
+    }
+    \caption{Performance metrics for all methods used in this study, which include: \glsentryfull{MDAE}, \glsentryfull{MAE}, \glsentryfull{RMSE}, \glsentryfull{MARPD}, \glsentryfull{R2}, miscalibration area (MisCal), calibration error (CalErr), sharpness (Sha), \glsentryfull{Cv}, and \glsentryfull{NLL}.
     The units of \gls{MDAE}, \gls{MAE}, \gls{RMSE}, and sharpness are all in \gls{eV}.
     The units of \gls{MARPD} are in \%.
-    The miscalibration area, calibration error, and \gls{NLL} are unitless.
-    \gls{NLL} values were all divided by 1,000 to improve readability.}\label{tab:results}
+    The miscalibration area, calibration error, \gls{Cv}, and \gls{NLL} are unitless.}\label{tab:results}
 \end{table}
 
 Regarding accuracy:  All methods' \gls{MDAE} results are virtually identical, and their \gls{MAE} results are within 10\% of each other.
@@ -537,7 +555,7 @@ Regarding calibration:  The \gls{NN} ensemble, \gls{BNN}, and \gls{dropout} are 
 The three more calibrated methods all share a characteristic that the other methods do not:  They all start with a \gls{NN} that is dedicated for prediction alone, and then they end with some other in-series method to estimate uncertainty.
 Interestingly, this in-series method of learning predictions and then learning uncertainties is similar in spirit to how gradient boosted models ``learn in stages'' using an ensemble of models.
 
-Regarding sharpness:  The \gls{NN} ensemble, \gls{BNN}, and \gls{dropout} models yield the sharpest uncertainties, although they do so at the cost of calibration.
+Regarding sharpness:  The \gls{NN} ensemble, \gls{BNN}, and \gls{dropout} models yield the most sharp uncertainties, although they do so at the cost of calibration.
 Among the three more calibrated models, the \gls{dNN} yields the lowest sharpness of 0.16 eV while the \gls{dGP} and \gls{CFGP} yield sharpnesses of 0.21 and 0.24 eV, respectively.
 Note how \gls{GP}-based \gls{UQ} methods tend to yield less sharp uncertainties than methods based purely on \gls{NN}s.
 This suggests that \gls{GP}s may yield more conservative \gls{UQ}s.
