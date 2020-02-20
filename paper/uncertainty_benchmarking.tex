@@ -106,7 +106,8 @@ We acknowledge that such insights may not be transferable to other applications,
     \caption{Overview of proposed procedure for judging the quality of models with uncertainty estimates.
     First and foremost, the models should be accurate.
     Second, the models should be ``calibrated'', which means that their uncertainty estimates should be comparable with their residuals.
-    Third, the models should be ``sharp'', which means that their uncertainty estimates should be narrow.
+    Third, the models should be ``sharp'', which means that their uncertainty estimates should be low.
+    Lastly, the models should be ``disperse'', which means that the distribution of the uncertainty estimates should be wide.
     This study demonstrates how to visualize and quantify these characteristics so that different methods of \gls{UQ} can be compared objectively.}\label{fig:overview}
 \end{figure}
 
@@ -298,7 +299,8 @@ See Equation~\ref{eq:dispersion}:
 
 \noindent where $\sigma_n$ is the predicted standard deviation of point $n$, $\mu_{\sigma}$ is the average value of $\sigma_n$, and $N$ is the total number of test points.
 Low values of \gls{Cv} indicate a narrow dispersion of uncertainty estimates, which may suggest poor performance in out-of-domain predictions.
-Thus a higher \gls{Cv} may indicate more robust uncertainty estimates, but as \citet{Scalia2019} point out, the optimal dispersion is a function of the validation/test data distribution.
+Thus a higher \gls{Cv} may indicate more robust uncertainty estimates.
+But as \citet{Scalia2019} point out, the optimal dispersion is a function of the validation/test data distribution.
 Therefore, \gls{Cv} should be used as a secondary screening metric rather than a primary performance metric.
 
 We also assessed the performance of each predictive uncertainty method by comparing their \gls{NLL} values the test set.
